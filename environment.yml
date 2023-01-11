@@ -1,4 +1,4 @@
-name: dyn
+name: cells
 channels:
   - defaults
 dependencies:
