@@ -12,6 +12,31 @@ from skimage.filters import threshold_otsu
 M_AMBIENT = 2
 
 
+def img_to_contour(img):
+    """Extract the longest cluster/cell contour from an image.
+
+    Parameters
+    ----------
+    img : array-like
+        Image showing cells or cell clusters.
+
+    Returns
+    -------
+    contour : array-like, shape=[n_sampling_points, 2]
+        Contour of the longest cluster/cell in the image,
+        as an array of 2D coordinates on points sampling
+        the contour.
+    """
+    thresh = threshold_otsu(img)
+    binary = img > thresh
+    contours = measure.find_contours(binary, 0.8)
+    lengths = [len(c) for c in contours]
+    max_length = max(lengths)
+    index_max_length = lengths.index(max_length)
+    contour = contours[index_max_length]
+    return contour
+
+
 def _tif_video_to_lists(tif_path):
     """Convert a cell video into two trajectories of contours and images.
 
@@ -32,13 +57,8 @@ def _tif_video_to_lists(tif_path):
     imgs_list = []
     for img in img_stack:
         imgs_list.append(img)
-        thresh = threshold_otsu(img)
-        binary = img > thresh
-        contours = measure.find_contours(binary, 0.8)
-        lengths = [len(c) for c in contours]
-        max_length = max(lengths)
-        index_max_length = lengths.index(max_length)
-        contours_list.append(contours[index_max_length])
+        contour = img_to_contour(img)
+        contours_list.append(contour)
 
     return contours_list, imgs_list
 
@@ -108,7 +128,7 @@ def _exhaustive_align(curve, base_curve):
             [curve[(i + shift) % nb_sampling] for i in range(nb_sampling)]
         )
         aligned = preshape.align(point=reparametrized, base_point=base_curve)
-        distances[shift] = preshape.embedding_metric.norm(
+        distances[shift] = preshape.total_space_metric.norm(
             gs.array(aligned) - gs.array(base_curve)
         )
     shift_min = gs.argmin(distances)
