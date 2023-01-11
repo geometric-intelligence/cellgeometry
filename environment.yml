@@ -1,0 +1,19 @@
+name: dyn
+channels:
+  - defaults
+dependencies:
+  - python=3.8
+  - pip
+  - matplotlib>=3.5.1
+  - pip:
+    - autograd
+    - git+https://github.com/geomstats/geomstats.git
+    - jupyter
+    - jupyterlab-code-formatter
+    - mat73
+    - numba
+    - numpy>=1.23.0
+    - scikit-image
+    - torch>=1.11
+    - -r dev-requirements.txt
+    - opencv-python
