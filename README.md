@@ -7,6 +7,9 @@
 - From the code folder:
 
 `git clone git@github.com:bioshape-lab/cells.git`
+
+then:
+
 `cd cells`
 
 - Create the conda environment associated with this project:
