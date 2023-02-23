@@ -1,6 +1,6 @@
 """Utils to load experimental datasets of cells."""
 
-import dyn.dyn.features.basic as basic
+import cells.cells.basic as basic
 import geomstats.backend as gs
 import geomstats.datasets.utils as data_utils
 import numpy as np

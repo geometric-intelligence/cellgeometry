@@ -1,6 +1,12 @@
-"""Unit tests for the basic shape features."""
+"""Unit tests for the basic shape features.
 
-import dyn.features.basic as basic
+If it does not find cells, run this line in your terminal:
+source ~/.bashrc
+"""
+
+
+
+import cells.cells.basic as basic
 import geomstats.backend as gs
 
 
