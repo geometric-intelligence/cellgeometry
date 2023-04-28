@@ -1,13 +1,20 @@
 [tool.poetry]
 name = "cells"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "Statistical Cell Shape Analysis"
+authors = ["Amil Khan <amil@ucsb.edu>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
 streamlit = "^1.21.0"
+numpy = "1.23.0"
+geomstats = {git = "https://github.com/geomstats/geomstats.git"}
+scikit-image = "^0.20.0"
+matplotlib = "^3.7.1"
+numba = "^0.56.4"
+torch = "^2.0.0"
+autograd = "^1.5"
 
 
 [build-system]
