@@ -1,5 +1,7 @@
 # Statistical Analysis of Cell Shapes
 
+[![Docker](https://github.com/bioshape-lab/cells/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/bioshape-lab/cells/actions/workflows/docker-publish.yml)
+
 ## Install
 
 - Open a terminal in Visual Studio Code
