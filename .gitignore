@@ -1,5 +1,5 @@
 # Data
-cells/saved_figs/osteosarcoma/*
+cells/saved_figs/**
 
 # VScode config
 .DS_Store
