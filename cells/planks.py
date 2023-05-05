@@ -1,6 +1,7 @@
 """Manage Shear Planks."""
 
 import geomstats.backend as gs
+import numpy as np
 
 
 def get_array_perplank(data_dict: dict, img: str) -> list:
