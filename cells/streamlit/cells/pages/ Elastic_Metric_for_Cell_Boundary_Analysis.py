@@ -4,6 +4,7 @@ import geomstats.backend as gs
 import streamlit as st
 import time
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
@@ -142,6 +143,67 @@ for i, (mean_name, mean) in enumerate(means.items()):
 
 st.pyplot(fig)
 
+
+
+fig = plt.figure(figsize=(18, 8))
+
+ncols = len(means) // 2
+
+for i, (mean_name, mean) in enumerate(means.items()):
+    ax = fig.add_subplot(2, ncols, i+1)
+    mean = CLOSED_CURVES_SPACE.projection(mean)
+    ax.plot(mean[:, 0], mean[:, 1], "black")
+    ax.set_aspect("equal")
+    ax.axis("off")
+    axs_title = mean_name
+    if mean_name not in ["Linear", "SRV"]:
+        a = mean_name[0]
+        b = mean_name[1]
+        ratio = a / (2 * b)
+        mean_name = f"Elastic {mean_name}\n a / (2b) = {ratio}"
+    ax.set_title(mean_name)
+
+
+st.markdown("__Remark:__ Unfortunately, there are some numerical issues with the projection in the space of closed curves, as shown by the V-shaped results above.")
+            
+st.markdown("Since ratios of 1 give the same results as for the SRV metric, we only select AS, BS with a ratio that is not 1 for the elastic metrics.")
+
+st.markdown("We also continue the analysis with the space of open curves, as opposed to the space of closed curves, for the numerical issues observed above.")
+
+
+NEW_AS = [0.75, 0.5, 0.25, 0.01] #, 1.6] #, 1.4, 1.2, 1, 0.5, 0.2, 0.1]
+NEW_BS = [0.5, 0.5, 0.5, 0.5] #, 2, 2, 2, 2, 2, 2, 2]
+
+st.makrdown("## Distances to the Mean")
+
+# We multiply the distances by a 100, for visualization purposes. It amounts to a change of units.
+dists = {}
+
+dists["Linear"] = [100 * gs.linalg.norm(means["Linear"] - cell) / n_sampling_points for cell in cell_shapes]
+
+dists["SRV"] = [
+    100 * SRV_METRIC.dist(means["SRV"], cell) / n_sampling_points for cell in cell_shapes
+]
+
+for a, b in zip(NEW_AS, NEW_BS):
+    dists[a, b] =  [
+    100 * ELASTIC_METRIC[a, b].dist(means[a, b], cell) / n_sampling_points for cell in cell_shapes
+]
+
+
+dists_summary = pd.DataFrame(
+    data={
+        labels_a_name: labels_a,
+        labels_b_name: labels_b,
+        "Linear": dists["Linear"],
+        "SRV": dists["SRV"],
+    }
+)
+
+for a, b in zip(NEW_AS, NEW_BS):
+    dists_summary[f"Elastic({a}, {b})"] = dists[a, b]
+
+st.dataframe(dists_summary)
 # SAVEFIG = True
 # if SAVEFIG:
 #     figs_dir = os.path.join(work_dir, f"cells/saved_figs/{dataset_name}")

@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "cells"
+version = "0.1.0"
+description = "Streamlit application for Cell Shape Analysis"
+authors = ["Amil Khan <amil@ucsb.edu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+streamlit = "^1.21.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
