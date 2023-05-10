@@ -2,6 +2,11 @@ import streamlit as st
 import pandas as pd
 from io import StringIO
 
+st.set_page_config(
+    page_title="Cell Shear Analysis",
+    page_icon="💥",
+)
+
 st.write("# Welcome to the Cell Shear Analysis App! 👋")
 
 st.markdown(
@@ -38,10 +43,8 @@ if uploaded_file is not None:
     # Can be used wherever a "file-like" object is accepted:
     dataframe = pd.read_csv(uploaded_file)
     st.write(dataframe)
-st.set_page_config(
-    page_title="Hello",
-    page_icon="👋",
-)
+
+
 
 
 

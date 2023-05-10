@@ -174,7 +174,7 @@ st.markdown("We also continue the analysis with the space of open curves, as opp
 NEW_AS = [0.75, 0.5, 0.25, 0.01] #, 1.6] #, 1.4, 1.2, 1, 0.5, 0.2, 0.1]
 NEW_BS = [0.5, 0.5, 0.5, 0.5] #, 2, 2, 2, 2, 2, 2, 2]
 
-st.makrdown("## Distances to the Mean")
+st.markdown("## Distances to the Mean")
 
 # We multiply the distances by a 100, for visualization purposes. It amounts to a change of units.
 dists = {}
