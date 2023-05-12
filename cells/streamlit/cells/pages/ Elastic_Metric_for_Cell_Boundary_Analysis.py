@@ -174,7 +174,7 @@ st.markdown("We also continue the analysis with the space of open curves, as opp
 NEW_AS = [0.75, 0.5, 0.25, 0.01] #, 1.6] #, 1.4, 1.2, 1, 0.5, 0.2, 0.1]
 NEW_BS = [0.5, 0.5, 0.5, 0.5] #, 2, 2, 2, 2, 2, 2, 2]
 
-st.makrdown("## Distances to the Mean")
+st.markdown("## Distances to the Mean")
 
 # We multiply the distances by a 100, for visualization purposes. It amounts to a change of units.
 dists = {}
@@ -203,7 +203,7 @@ dists_summary = pd.DataFrame(
 for a, b in zip(NEW_AS, NEW_BS):
     dists_summary[f"Elastic({a}, {b})"] = dists[a, b]
 
-st.dataframe(dists_summary)
+st.dataframe(dists_summary) 
 # SAVEFIG = True
 # if SAVEFIG:
 #     figs_dir = os.path.join(work_dir, f"cells/saved_figs/{dataset_name}")

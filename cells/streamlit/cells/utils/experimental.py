@@ -207,6 +207,75 @@ def preprocess(
     return cells, cell_shapes, labels_a, labels_b
 
 
+
+def nolabel_preprocess(
+    cells,
+    # labels_a,
+    # labels_b,
+    n_cells,
+    n_sampling_points,
+    quotient=["scaling", "rotation"],
+):
+    """Preprocess a dataset of cells.
+
+    Parameters
+    ----------
+    cells : list of all cells
+        Each cell is an array of points in 2D.
+    labels_a : list of str
+        List of labels associated with each cell.
+    labels_b : list of str
+        List of labels associated with each cell.
+    n_cells : int
+        Number of cells to (randomly) select from this dataset.
+    n_sampling_points : int
+        Number of sampling points along the boundary of each cell.
+    """
+    # if n_cells > 0:
+    #     print(f"... Selecting only a random subset of {n_cells} / {len(cells)} cells.")
+    #     indices = sorted(
+    #         np.random.choice(gs.arange(0, len(cells), 1), size=n_cells, replace=False)
+    #     )
+    #     cells = [cells[idx] for idx in indices]
+    #     labels_a = [labels_a[idx] for idx in indices]
+    #     labels_b = [labels_b[idx] for idx in indices]
+
+    if n_sampling_points > 0:
+        print(
+            "... Interpolating: "
+            f"Cell boundaries have {n_sampling_points} samplings points."
+        )
+        interpolated_cells = gs.zeros((n_cells, n_sampling_points, 2))
+        for i_cell, cell in enumerate(cells):
+            interpolated_cells[i_cell] = _interpolate(cell, n_sampling_points)
+
+        cells = interpolated_cells
+
+    print("... Removing potential duplicate sampling points on cell boundaries.")
+    for i_cell, cell in enumerate(cells):
+        cells[i_cell] = _remove_consecutive_duplicates(cell)
+
+    print("\n- Cells: quotienting translation.")
+    cells = cells - gs.mean(cells, axis=-2)[..., None, :]
+
+    cell_shapes = gs.zeros_like(cells)
+    if "scaling" in quotient:
+        print("- Cell shapes: quotienting scaling (length).")
+        for i_cell, cell in enumerate(cells):
+            cell_shapes[i_cell] = cell / basic.perimeter(cell)
+
+    if "rotation" in quotient:
+        print("- Cell shapes: quotienting rotation.")
+        if "scaling" not in quotient:
+            for i_cell, cell_shape in enumerate(cells):
+                cell_shapes[i_cell] = _exhaustive_align(cell_shape, cells[0])
+        else:
+            for i_cell, cell_shape in enumerate(cell_shapes):
+                cell_shapes[i_cell] = _exhaustive_align(cell_shape, cell_shapes[0])
+
+    return cells, cell_shapes #, labels_a, labels_b
+
+
 def load_treated_osteosarcoma_cells(
     n_cells=-1, n_sampling_points=10, quotient=["scaling", "rotation"]
 ):
