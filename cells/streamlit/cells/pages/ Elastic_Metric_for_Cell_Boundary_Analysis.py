@@ -203,7 +203,7 @@ dists_summary = pd.DataFrame(
 for a, b in zip(NEW_AS, NEW_BS):
     dists_summary[f"Elastic({a}, {b})"] = dists[a, b]
 
-st.dataframe(dists_summary)
+st.dataframe(dists_summary) 
 # SAVEFIG = True
 # if SAVEFIG:
 #     figs_dir = os.path.join(work_dir, f"cells/saved_figs/{dataset_name}")
