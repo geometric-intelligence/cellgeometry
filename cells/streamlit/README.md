@@ -4,8 +4,8 @@
 A brief description or introduction of the project.
 
 🔗 Table of Contents
-- [Project Description](#project-description)
-- [Features](#features)
+- [Project Description](#📝-project-description)
+- [Features](#🎯-features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
