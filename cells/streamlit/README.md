@@ -2,7 +2,7 @@
 
 [![Docker](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml)
 
-A brief description or introduction of the project.
+A web-based application for Cell Shape Analysis.
 
 
 :link: __Table of Contents__
@@ -16,15 +16,76 @@ A brief description or introduction of the project.
 
 ## 📝 Project Description 
 
-Provide a brief overview of the project, including its purpose and main functionalities. Describe the problem it solves or the goals it aims to achieve. You can also mention any dependencies or prerequisites needed to run the project.
+This project focuses on the analysis and comparison of biological cell shapes using elastic metrics implemented in Geomstats. The shapes of biological cells are determined by various processes and biophysical forces, which play a crucial role in cellular functions. By utilizing quantitative measures that reflect cellular morphology, this project aims to leverage large-scale biological cell image data for morphological studies.
 
-## 🎯 Features 
+The analysis of cell shapes has significant applications in various domains. One notable application is the accurate classification and discrimination of cancer cell lines treated with different drugs. Measures of irregularity and spreading of cells can provide valuable insights for understanding the effects of drug treatments.
 
-List and describe the main features of the project. Explain how users can benefit from these features and provide examples if applicable.
+## 🎯 Features
 
-## ⚙️ Installation 
+- Quantitative analysis and comparison of biological cell shapes using Geomstats.
+- Utilization of elastic metrics implemented in Geomstats for shape analysis.
+- Calculation of measures reflecting cellular morphology, facilitating in-depth characterization of cell shapes.
+- Leveraging large-scale biological cell image data for comprehensive morphological studies.
+- Framework for optimal matching, deforming, and comparing cell shapes using geodesics and geodesic distances.
+- Visualization of cellular shape variations, aiding in the interpretation and communication of analysis results.
+- User-friendly Streamlit app interface for seamless analysis, visualization, and interaction with biological cell data.
+- Comprehensive set of tools and methods, empowering researchers and scientists in cellular biology to gain insights and make discoveries.
 
-Outline the steps required to install and set up the project. Include any necessary dependencies and specify how to install them. Provide clear instructions and code snippets if needed.
+
+## ⚙️ Installation
+
+To install and set up the Streamlit app, follow these steps:
+
+1. Clone the repository:
+
+   ```bash
+   gh repo clone bioshape-lab/cells
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd cells/cells/streamlit
+   ```
+
+3. Create a virtual environment (optional but recommended):
+
+   ```bash
+   python -m venv env
+   ```
+
+4. Activate the virtual environment:
+
+   - For Windows:
+
+     ```bash
+     .\env\Scripts\activate
+     ```
+
+   - For macOS and Linux:
+
+     ```bash
+     source env/bin/activate
+     ```
+
+5. Install project dependencies using Poetry:
+
+   ```bash
+   poetry install
+   ```
+
+   This command reads the `pyproject.toml` file, resolves dependencies, and installs them into the virtual environment.
+
+6. Run the Streamlit app:
+
+   ```bash
+   streamlit run Hello.py
+   ```
+
+   The Streamlit app should now be running locally. Open your web browser and visit `http://localhost:8501` to access the app.
+
+> __Note:__ Make sure you have Python and Poetry installed on your machine before following these steps. The `pyproject.yaml` file should contain the necessary dependencies and their versions, enabling Poetry to manage the installation process effectively.
+
 
 ## 🚀 Usage 
 
@@ -65,9 +126,56 @@ The MIT License is a permissive open-source license that allows you to use, modi
 
 This project is extremely grateful for the guidance of Professor Nina Miolane and the members of BioShape lab for their feedback/invaluable discussions.
 
-## Frequently Asked Questions 
 
-Anticipate and answer common questions that users may have about the project. This section can save users time by addressing common concerns upfront.
+## ❓ Frequently Asked Questions
+
+<details>
+  <summary>Click to expand/collapse</summary>
+
+### Q1: What is Poetry?
+
+A1: Poetry is a dependency and package management tool for Python projects. It simplifies the management of project dependencies and helps with package installation, versioning, and resolution. It also provides features for creating virtual environments and publishing packages.
+
+### Q2: Why did you choose Poetry for package management?
+
+A2: We chose Poetry for package management because of its robust features and ease of use. Poetry simplifies the process of managing dependencies, ensuring consistent package versions across different environments, and allows for efficient package installation and updates.
+
+### Q3: How do I install Poetry?
+
+A3: To install Poetry, you can follow the official installation instructions provided in the [Poetry documentation](https://python-poetry.org/docs/#installation). It supports different operating systems, including Windows, macOS, and Linux.
+
+### Q4: How do I manage project dependencies with Poetry?
+
+A4: Poetry provides a simple and intuitive way to manage project dependencies. You can define your project's dependencies in the `pyproject.toml` file using the `[tool.poetry.dependencies]` section. Poetry handles dependency resolution and installation automatically when you run `poetry install`. You can also manage additional dependencies such as development and testing packages.
+
+### Q5: Can I use other package managers with Streamlit?
+
+A5: Yes, you can use other package managers like pip or conda with Streamlit. Streamlit is compatible with different package management systems, and you can use your preferred package manager to install and manage dependencies. However, if you're using Poetry for your project, it is recommended to stick with it for consistency and to ensure proper management of dependencies.
+
+### Q6: How do I deploy my Streamlit app with Poetry?
+
+A6: Deploying a Streamlit app with Poetry involves a few steps. First, ensure you have a proper deployment environment set up, such as a cloud-based service or hosting platform. Then, create a deployment configuration file, such as a `Dockerfile`, that includes the necessary instructions to install project dependencies using Poetry. Finally, follow the deployment instructions provided by your hosting platform to deploy your Streamlit app with the required dependencies.
+
+### Q7: How do I update my project dependencies with Poetry?
+
+A7: To update your project dependencies using Poetry, you can run `poetry update` command. This command updates your project's dependencies to their latest compatible versions as specified in the `pyproject.toml` file. Poetry resolves and installs the updated dependencies automatically, ensuring compatibility and consistency.
+
+### Q8: Can I share my Poetry-based Streamlit app with others?
+
+A8: Yes, you can share your Poetry-based Streamlit app with others. Ensure that you include the necessary files, such as the `pyproject.toml` and `poetry.lock`, which contain the dependency information. You can also provide instructions on how to set up and run the app, including the steps to install Poetry and run `poetry install` to install the dependencies.
+
+### Q9: Where can I find more information about Poetry?
+
+A9: You can find more information about Poetry, including detailed documentation and examples, on the official Poetry website: [python-poetry.org](https://python-poetry.org/). The documentation provides in-depth guidance on various aspects of using Poetry for package management.
+
+### Q10: Can I contribute to the project and suggest improvements?
+
+A10: Absolutely! Contributions and suggestions are welcome. Please refer to the [Contributing](#-contributing) section of this README for guidelines on how to contribute to the project. We appreciate your support!
+
+</details>
+
+
+
 
 ## Troubleshooting 
 
