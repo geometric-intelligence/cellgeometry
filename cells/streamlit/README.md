@@ -1,7 +1,9 @@
-# Cell Shape Analysis
+![Asset 1](https://github.com/bioshape-lab/cells/assets/22850980/e2accd9f-87ca-4657-baf3-2f45def08dc3)
+
 [![Docker](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml)
 
 A brief description or introduction of the project.
+
 
 :link: __Table of Contents__
 - [Project Description](#-project-description)
