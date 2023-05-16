@@ -3,7 +3,7 @@
 
 A brief description or introduction of the project.
 
-:link: Table of Contents
+:link: __Table of Contents__
 - [Project Description](#-project-description)
 - [Features](#-features)
 - [Installation](#-installation)
@@ -28,21 +28,40 @@ Outline the steps required to install and set up the project. Include any necess
 
 Explain how users can effectively use the project. Provide examples, code snippets, or screenshots to demonstrate its functionality. If applicable, describe different use cases and configurations.
 
-## 🤝 Contributing 
+## 🤝 Contributing
 
-Explain how others can contribute to the project. Specify the guidelines for submitting bug reports, feature requests, or pull requests. Mention any coding standards or conventions that contributors should follow. 
+We welcome and appreciate contributions to enhance the functionality and features of this Streamlit app. To contribute, please follow these guidelines:
+
+1. Fork the repository and clone it to your local machine.
+2. Create a new branch for your contribution: `git checkout -b feature/your-feature-name`.
+3. Make your changes and ensure that the app is still functioning properly.
+4. Commit your changes: `git commit -m "Add your commit message here"`.
+5. Push to the branch: `git push origin feature/your-feature-name`.
+6. Open a pull request, providing a clear description of your changes and their purpose.
+7. Our team will review the pull request and provide feedback and suggestions if needed.
+8. Once the pull request is approved, it will be merged into the main branch.
+
+### Guidelines for Contributions
+
+- Follow the coding style and conventions used in the existing codebase.
+- Ensure your code is well-documented, with clear comments and explanations where necessary.
+- Write unit tests for new features or modifications to ensure the stability of the app.
+- Keep your pull requests focused on a specific feature or bug fix to facilitate review.
+- Be respectful and considerate towards others when discussing and addressing feedback.
+
+By contributing to this Streamlit app, you agree that your contributions will be licensed under the same [MIT License](LICENSE) that covers the project.
+
+Thank you for considering contributing to this app. Your contributions are highly valued and help improve the overall quality and user experience of the app.
 
 ## 📄 License 
 
-State the license under which the project is distributed. Specify any terms or conditions associated with the license. If you're using an open-source license, provide a link to the full license text.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+The MIT License is a permissive open-source license that allows you to use, modify, and distribute the code in both commercial and non-commercial projects. It provides you with the freedom to adapt the software to your needs, while also offering some protection against liability. It is one of the most commonly used licenses in the open-source community.
 
 ## 🙏 Acknowledgments 
 
-Give credit to any individuals, organizations, or resources that have been helpful throughout the development of the project. Express gratitude to any contributors or inspirations. You can also mention any external libraries, frameworks, or tools that were used.
-
-Feel free to customize this README.md template to suit the needs of your project. You can add additional sections or modify existing ones as necessary.
-
-📝 **Note:** Make sure to update the sections with relevant information and remove this note before publishing your repository.
+This project is extremely grateful for the guidance of Professor Nina Miolane and the members of BioShape lab for their feedback/invaluable discussions.
 
 ## Frequently Asked Questions 
 
