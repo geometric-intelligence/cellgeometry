@@ -3,15 +3,6 @@
 
 A brief description or introduction of the project.
 
-🔗 Table of Contents
-- [Project Description](#📝-project-description)
-- [Features](#🎯-features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
-
 ## 📝 Project Description 
 
 Provide a brief overview of the project, including its purpose and main functionalities. Describe the problem it solves or the goals it aims to achieve. You can also mention any dependencies or prerequisites needed to run the project.
