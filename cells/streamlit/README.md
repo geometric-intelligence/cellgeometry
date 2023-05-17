@@ -87,9 +87,46 @@ To install and set up the Streamlit app, follow these steps:
 > __Note:__ Make sure you have Python and Poetry installed on your machine before following these steps. The `pyproject.yaml` file should contain the necessary dependencies and their versions, enabling Poetry to manage the installation process effectively.
 
 
-## 🚀 Usage 
+## 🚀 Usage
 
-Explain how users can effectively use the project. Provide examples, code snippets, or screenshots to demonstrate its functionality. If applicable, describe different use cases and configurations.
+To use the Streamlit app, follow these steps:
+
+1. Make sure you have completed the installation steps mentioned in the [Installation](#-installation) section.
+
+2. Ensure that the virtual environment is activated:
+
+   - For Windows:
+
+     ```bash
+     .\env\Scripts\activate
+     ```
+
+   - For macOS and Linux:
+
+     ```bash
+     source env/bin/activate
+     ```
+
+3. Run the Streamlit app:
+
+   ```bash
+   streamlit run Hello.py
+   ```
+
+4. Once the app is running, it will display a local URL, such as `http://localhost:8501`.
+
+5. Open your web browser and visit the provided URL to access the Streamlit app.
+
+6. Interact with the app's user interface to explore and analyze the biological cell shapes.
+
+7. Customize the parameters, select different options, or upload your own data to observe the impact on the analysis and visualization of cell shapes.
+
+8. View the results and visualizations presented by the app, which may include statistical summaries, plots, or interactive displays.
+
+9. Experiment with different features and functionalities of the app to gain insights into the morphological characteristics of the cells.
+
+10. To stop the app, press `Ctrl+C` in the terminal or command prompt where it is running.
+
 
 ## 🤝 Contributing
 
