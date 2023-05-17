@@ -1,4 +1,5 @@
-![Asset 1](https://github.com/bioshape-lab/cells/assets/22850980/e2accd9f-87ca-4657-baf3-2f45def08dc3)
+![Asset 2](https://github.com/bioshape-lab/cells/assets/22850980/cf1ca7b1-b9d2-4055-b80d-e2bef7a2e796)
+
 
 [![Docker](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml)
 
