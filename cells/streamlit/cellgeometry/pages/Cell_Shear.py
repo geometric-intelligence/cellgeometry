@@ -29,10 +29,12 @@ st.markdown(
 """
 )
 
-cells_list = st.session_state["cells_list"] 
+cells_list = st.session_state["cells_list"]
 
-n_sampling_points = st.slider('Select the Number of Sampling Points', 0, 100, 50)
-cells, cell_shapes = experimental.nolabel_preprocess(cells_list, len(cells_list), n_sampling_points)
+n_sampling_points = st.slider("Select the Number of Sampling Points", 0, 100, 50)
+cells, cell_shapes = experimental.nolabel_preprocess(
+    cells_list, len(cells_list), n_sampling_points
+)
 
 
 R1 = Euclidean(dim=1)
@@ -42,8 +44,8 @@ SRV_METRIC = CURVES_SPACE.srv_metric
 L2_METRIC = CURVES_SPACE.l2_curves_metric
 
 ELASTIC_METRIC = {}
-AS = [1, 2, 0.75, 0.5, 0.25, 0.01] #, 1.6] #, 1.4, 1.2, 1, 0.5, 0.2, 0.1]
-BS = [0.5, 1, 0.5, 0.5, 0.5, 0.5] #, 2, 2, 2, 2, 2, 2, 2]
+AS = [1, 2, 0.75, 0.5, 0.25, 0.01]  # , 1.6] #, 1.4, 1.2, 1, 0.5, 0.2, 0.1]
+BS = [0.5, 1, 0.5, 0.5, 0.5, 0.5]  # , 2, 2, 2, 2, 2, 2, 2]
 for a, b in zip(AS, BS):
     ELASTIC_METRIC[a, b] = DiscreteCurves(R2, a=a, b=b).elastic_metric
 METRICS = {}
@@ -54,23 +56,25 @@ METRICS["SRV"] = SRV_METRIC
 means = {}
 
 means["Linear"] = gs.mean(cell_shapes, axis=0)
-means["SRV"] = FrechetMean(
-        metric=SRV_METRIC, 
-        method="default").fit(cell_shapes).estimate_
+means["SRV"] = (
+    FrechetMean(metric=SRV_METRIC, method="default").fit(cell_shapes).estimate_
+)
 
 
 for a, b in zip(AS, BS):
-    means[a, b] = FrechetMean(
-            metric=ELASTIC_METRIC[a, b], 
-            method="default").fit(cell_shapes).estimate_
-    
+    means[a, b] = (
+        FrechetMean(metric=ELASTIC_METRIC[a, b], method="default")
+        .fit(cell_shapes)
+        .estimate_
+    )
+
 
 fig = plt.figure(figsize=(18, 8))
 
 ncols = len(means) // 2
 
 for i, (mean_name, mean) in enumerate(means.items()):
-    ax = fig.add_subplot(2, ncols, i+1)
+    ax = fig.add_subplot(2, ncols, i + 1)
     ax.plot(mean[:, 0], mean[:, 1], "black")
     ax.set_aspect("equal")
     ax.axis("off")
@@ -90,7 +94,7 @@ fig = plt.figure(figsize=(18, 8))
 ncols = len(means) // 2
 
 for i, (mean_name, mean) in enumerate(means.items()):
-    ax = fig.add_subplot(2, ncols, i+1)
+    ax = fig.add_subplot(2, ncols, i + 1)
     mean = CLOSED_CURVES_SPACE.projection(mean)
     ax.plot(mean[:, 0], mean[:, 1], "black")
     ax.set_aspect("equal")
@@ -104,4 +108,3 @@ for i, (mean_name, mean) in enumerate(means.items()):
     ax.set_title(mean_name)
 
 st.pyplot(fig)
-
