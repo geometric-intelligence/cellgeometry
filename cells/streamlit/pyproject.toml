@@ -1,15 +1,18 @@
 [tool.poetry]
-name = "cells"
-version = "0.1.0"
+name = "cellgeometry"
+version = "0.1.2"
 description = "Statistical Cell Shape Analysis"
-authors = ["Amil Khan <amil@ucsb.edu>"]
+authors = ["Amil Khan <amil@ucsb.edu>", "Samuel Feinstein <sdfeinstein@ucsb.edu>"]
 readme = "README.md"
+license = "MIT"
+repository = "https://github.com/bioshape-lab/cells"
+homepage = "https://github.com/bioshape-lab/cells/tree/main/cells/streamlit"
 
 [tool.poetry.dependencies]
 python = "^3.10"
 streamlit = "^1.21.0"
 numpy = "1.23.0"
-geomstats = {git = "https://github.com/geomstats/geomstats.git"}
+geomstats = "^2.5.0"
 scikit-image = "^0.20.0"
 matplotlib = "^3.7.1"
 numba = "^0.56.4"
