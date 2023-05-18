@@ -22,7 +22,7 @@ def build_rois(path) -> dict:
     rois = {}
     for roi in sorted(os.listdir(path)):
         # print(roi.split(".")[0])
-        rois[roi.split(".")[0]] = read_roi_zip(os.path.join(path,roi))
+        rois[roi.split(".")[0]] = read_roi_zip(os.path.join(path, roi))
     return rois
 
 
@@ -52,13 +52,13 @@ def find_key(dictionary, target_key):
     """
     if target_key in dictionary:
         return dictionary[target_key]
-    
+
     for value in dictionary.values():
         if isinstance(value, dict):
             result = find_key(value, target_key)
             if result is not None:
                 return result
-    
+
     return None
 
 
@@ -97,4 +97,6 @@ def find_all_instances(dictionary, target_key1, target_key2, results_list):
             find_all_instances(value, target_key1, target_key2, results_list)
 
     if {target_key1, target_key2}.issubset(found_keys):
-        results_list.append(np.array([dictionary[target_key1], dictionary[target_key2]]).T)
+        results_list.append(
+            np.array([dictionary[target_key1], dictionary[target_key2]]).T
+        )

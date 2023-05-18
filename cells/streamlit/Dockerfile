@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir poetry && \
     poetry install --no-dev
 
 # Copy the entire project directory into the container
-COPY cells .
+COPY cellgeometry .
 
 # Expose the port that Streamlit listens on (8501 by default)
 EXPOSE 8501

@@ -5,7 +5,8 @@ import time
 import matplotlib.pyplot as plt
 
 import sys
-sys.path.append("/app/utils") 
+
+sys.path.append("/app/utils")
 
 from utils.data_utils import build_rois, find_all_instances
 
@@ -18,12 +19,12 @@ time_string = time.strftime("%H%M%S", current_time)
 current_time_string = f"{year}{day_of_year}-{time_string}"
 
 if "cells_list" not in st.session_state:
-   st.session_state["cells_list"] = True
+    st.session_state["cells_list"] = True
 
 st.write("# Load Your Cell Data 👋")
 
 st.markdown(
-"""
+    """
 ## Getting Started
 
 We currently support an ROI zip folder created by FIJI/ImageJ. What this means is you may have a folder structure as follows:
@@ -42,6 +43,7 @@ You can simply upload this ROIs folder and we will load your data for you. We pl
 Your chosen data structure __must__ contain `x` and `y` for the program to correctly parse and load your data.
 """
 )
+
 
 def get_files_from_folder(folder_path):
     """
@@ -66,7 +68,6 @@ def get_files_from_folder(folder_path):
     return files
 
 
-
 # Specify the folder path for file uploads and save run with date and time
 upload_folder = f"/app/data/run-{current_time_string}"
 
@@ -79,9 +80,10 @@ if not os.path.exists(upload_folder):
 files = get_files_from_folder(upload_folder)
 
 
-
 # Display the file uploader
-uploaded_files = st.file_uploader("Upload a file", type=["zip"], accept_multiple_files=True)
+uploaded_files = st.file_uploader(
+    "Upload a file", type=["zip"], accept_multiple_files=True
+)
 
 
 # Process the uploaded files
@@ -105,15 +107,17 @@ dict_rois = build_rois(upload_folder)
 
 # Extract the cells
 cells_list = []
-find_all_instances(dict_rois, 'x', 'y', cells_list)
+find_all_instances(dict_rois, "x", "y", cells_list)
 st.session_state["cells_list"] = cells_list
 
 st.write(f"Successfully Loaded {len(cells_list)} cells.")
 
 # Sanity check visualization
-cell_num = st.number_input(f"Visualize a cell. Pick a number between 0 and {len(cells_list)-1}", min_value=0)
+cell_num = st.number_input(
+    f"Visualize a cell. Pick a number between 0 and {len(cells_list)-1}", min_value=0
+)
 
 
 fig, ax = plt.subplots()
-ax.plot(cells_list[cell_num][:,0], cells_list[cell_num][:,1])
+ax.plot(cells_list[cell_num][:, 0], cells_list[cell_num][:, 1])
 st.pyplot(fig)

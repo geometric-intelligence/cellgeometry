@@ -207,7 +207,6 @@ def preprocess(
     return cells, cell_shapes, labels_a, labels_b
 
 
-
 def nolabel_preprocess(
     cells,
     # labels_a,
@@ -273,7 +272,7 @@ def nolabel_preprocess(
             for i_cell, cell_shape in enumerate(cell_shapes):
                 cell_shapes[i_cell] = _exhaustive_align(cell_shape, cell_shapes[0])
 
-    return cells, cell_shapes #, labels_a, labels_b
+    return cells, cell_shapes  # , labels_a, labels_b
 
 
 def load_treated_osteosarcoma_cells(
