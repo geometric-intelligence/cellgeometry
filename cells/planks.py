@@ -3,6 +3,31 @@
 import geomstats.backend as gs
 import numpy as np
 
+def interpolate_dicrete_curve(curve, n_sampling_points):
+    """
+    Interpolate a discrete curve so that it gets a given number of sampling points.
+
+    Parameters
+    ----------
+    curve : array-like, shape=[n_points, 2]
+    n_sampling_points : int
+    
+    Returns
+    -------
+    interpolation : array-like, shape=[n_sampling_points, 2]
+       Discrete curve with n_sampling_points
+    """
+    old_length = curve.shape[0]
+    interpolation = np.zeros((n_sampling_points, 2))
+    incr = old_length / n_sampling_points
+    pos = np.array(0.0, dtype=np.float32)
+    for i in range(n_sampling_points):
+        index = int(np.floor(pos))
+        interpolation[i] = curve[index] + (pos - index) * (
+            curve[(index + 1) % old_length] - curve[index]
+        )
+        pos += incr
+    return gs.array(interpolation, dtype=gs.float32)
 
 def get_array_perplank(data_dict: dict, img: str) -> list:
     """
@@ -63,31 +88,3 @@ def exhaustive_align(curve, base_curve):
         point=gs.array(reparametrized_min), base_point=base_curve
     )
     return aligned_curve
-
-
-def interpolate_dicrete_curve(curve, n_sampling_points):
-    """
-    Interpolate a discrete curve so that it gets a given number of sampling points.
-
-    Parameters
-    ----------
-    curve : array-like, shape=[n_points, 2]
-    n_sampling_points : int
-    
-    Returns
-    -------
-    interpolation : array-like, shape=[n_sampling_points, 2]
-       Discrete curve with n_sampling_points
-    """
-    old_length = curve.shape[0]
-    interpolation = np.zeros((n_sampling_points, 2))
-    incr = old_length / n_sampling_points
-    pos = np.array(0.0, dtype=np.float32)
-    for i in range(n_sampling_points):
-        index = int(np.floor(pos))
-        interpolation[i] = curve[index] + (pos - index) * (
-            curve[(index + 1) % old_length] - curve[index]
-        )
-        pos += incr
-    return gs.array(interpolation, dtype=gs.float32)
-
