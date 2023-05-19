@@ -85,6 +85,9 @@ uploaded_files = st.file_uploader(
     "Upload a file", type=["zip"], accept_multiple_files=True
 )
 
+if not uploaded_files:
+  st.warning('Please upload a zipped file of ROIs')
+  st.stop()
 
 # Process the uploaded files
 if uploaded_files is not None:

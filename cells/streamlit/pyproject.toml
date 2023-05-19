@@ -16,9 +16,9 @@ geomstats = "^2.5.0"
 scikit-image = "^0.20.0"
 matplotlib = "^3.7.1"
 numba = "^0.56.4"
-torch = "^2.0.0"
 autograd = "^1.5"
 read-roi = "^1.6.0"
+plotly = "^5.14.1"
 
 
 [build-system]
