@@ -32,7 +32,7 @@ CURVES_SPACE = DiscreteCurves(R2)
 SRV_METRIC = CURVES_SPACE.srv_metric
 L2_METRIC = CURVES_SPACE.l2_curves_metric
 
-n_components = st.slider('Select the Number of Sampling Points', 0, len(cells_flat), 10)
+n_components = st.slider('Select the Number of Components', 0, len(cells_flat), 10)
 
 pcas = {}
 pcas["Linear"] = PCA(n_components=n_components).fit(cells_flat)
