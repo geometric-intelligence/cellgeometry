@@ -159,7 +159,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 The MIT License is a permissive open-source license that allows you to use, modify, and distribute the code in both commercial and non-commercial projects. It provides you with the freedom to adapt the software to your needs, while also offering some protection against liability. It is one of the most commonly used licenses in the open-source community.
 
-## 🙏 Acknowledgments 
+## :raised_hands: Acknowledgments 
 
 This project is extremely grateful for the guidance of Professor Nina Miolane and the members of BioShape lab for their feedback/invaluable discussions.
 
