@@ -1,6 +1,8 @@
 import os
 from read_roi import read_roi_zip
 import numpy as np
+import pandas as pd
+
 
 
 def build_rois(path) -> dict:
@@ -100,3 +102,63 @@ def find_all_instances(dictionary, target_key1, target_key2, results_list):
         results_list.append(
             np.array([dictionary[target_key1], dictionary[target_key2]]).T
         )
+
+
+
+
+def get_files_from_folder(folder_path):
+    """
+    Retrieves a list of files from a specific folder.
+
+    Parameters:
+        folder_path (str): The path to the folder.
+
+    Returns:
+        list: A list of file paths.
+
+    Example:
+        >>> folder_path = '/path/to/folder'
+        >>> files = get_files_from_folder(folder_path)
+        >>> print(files)
+        ['/path/to/folder/file1.txt', '/path/to/folder/file2.csv', '/path/to/folder/file3.jpg']
+    """
+    files = []
+    for filename in os.listdir(folder_path):
+        if os.path.isfile(os.path.join(folder_path, filename)):
+            files.append(os.path.join(folder_path, filename))
+    return files
+
+
+
+
+def infer_read_csv_args(file_path):
+    with open(file_path, 'r') as file:
+        # Read the first line of the file
+        first_line = file.readline()
+
+        # Check for potential delimiters (sep)
+        delimiters = [',', ';', '\t', '|']  # List of potential delimiters
+        sep = None
+
+        for delimiter in delimiters:
+            if delimiter in first_line:
+                sep = delimiter
+                break
+
+        # Check for header row (header)
+        header = 'infer' if pd.read_csv(file_path, nrows=2).shape[0] == 2 else None
+
+    return sep, header
+
+
+
+def check_file_extensions(file_paths):
+    valid_extensions = ['.zip', '.txt', '.csv']
+    file_extensions = []
+
+    for file_path in file_paths:
+        extension = file_path[file_path.rfind('.'):].lower()
+        if extension in valid_extensions:
+            file_extensions.append(extension)
+
+    return file_extensions

@@ -56,32 +56,22 @@ if not os.path.exists(upload_folder):
     os.makedirs(upload_folder)
     st.info(f"Upload folder created: {upload_folder}")
 
-# Get the list of files in the upload folder
-files = get_files_from_folder(upload_folder)
-
-extension = check_file_extensions(files)
-
-if extension[0] in ['.csv', '.txt']:
-
-    # Get the seperator and check the header
-    sep, header = infer_read_csv_args(files)
-
-    # Read the CSV file using inferred arguments
-    df = pd.read_csv(files, sep=sep, header=header)
-
-    st.dataframe(df)
-
-
-
 
 # Display the file uploader
 uploaded_files = st.file_uploader(
     "Upload a file", type=["zip", "csv", "txt"], accept_multiple_files=True
 )
 
+
+# if uploaded_files is None:
+#   st.warning('Please upload a zipped file of ROIs')
+#   st.stop()
+
+
 if not uploaded_files:
   st.warning('Please upload a zipped file of ROIs')
   st.stop()
+
 
 # Process the uploaded files
 if uploaded_files is not None:
@@ -99,22 +89,41 @@ if uploaded_files is not None:
         # st.write(f"File saved: {file_path}")
 
 
-# Build a dictionary of all the ROIs
-dict_rois = build_rois(upload_folder)
 
-# Extract the cells
-cells_list = []
-find_all_instances(dict_rois, "x", "y", cells_list)
-st.session_state["cells_list"] = cells_list
-
-st.write(f"Successfully Loaded {len(cells_list)} cells.")
-
-# Sanity check visualization
-cell_num = st.number_input(
-    f"Visualize a cell. Pick a number between 0 and {len(cells_list)-1}", min_value=0
-)
+# Get the list of files in the upload folder
+files = get_files_from_folder(upload_folder)
 
 
-fig, ax = plt.subplots()
-ax.plot(cells_list[cell_num][:, 0], cells_list[cell_num][:, 1])
-st.pyplot(fig)
+extension = check_file_extensions(files)
+
+
+if extension[0] in ['.csv', '.txt']:
+
+    # Get the seperator and check the header
+    sep, header = infer_read_csv_args(files[0])
+
+    # Read the CSV file using inferred arguments
+    df = pd.read_csv(files[0], sep=sep, header=header)
+
+    st.dataframe(df)
+
+else:
+    # Build a dictionary of all the ROIs
+    dict_rois = build_rois(upload_folder)
+
+    # Extract the cells
+    cells_list = []
+    find_all_instances(dict_rois, "x", "y", cells_list)
+    st.session_state["cells_list"] = cells_list
+
+    st.write(f"Successfully Loaded {len(cells_list)} cells.")
+
+    # Sanity check visualization
+    cell_num = st.number_input(
+        f"Visualize a cell. Pick a number between 0 and {len(cells_list)-1}", min_value=0
+    )
+
+
+    fig, ax = plt.subplots()
+    ax.plot(cells_list[cell_num][:, 0], cells_list[cell_num][:, 1])
+    st.pyplot(fig)
