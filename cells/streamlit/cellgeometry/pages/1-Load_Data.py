@@ -8,7 +8,7 @@ import sys
 
 sys.path.append("/app/utils")
 
-from utils.data_utils import build_rois, find_all_instances
+from utils.data_utils import build_rois, find_all_instances, infer_read_csv_args, get_files_from_folder, check_file_extensions
 
 current_time = time.localtime()
 
@@ -45,27 +45,7 @@ Your chosen data structure __must__ contain `x` and `y` for the program to corre
 )
 
 
-def get_files_from_folder(folder_path):
-    """
-    Retrieves a list of files from a specific folder.
 
-    Parameters:
-        folder_path (str): The path to the folder.
-
-    Returns:
-        list: A list of file paths.
-
-    Example:
-        >>> folder_path = '/path/to/folder'
-        >>> files = get_files_from_folder(folder_path)
-        >>> print(files)
-        ['/path/to/folder/file1.txt', '/path/to/folder/file2.csv', '/path/to/folder/file3.jpg']
-    """
-    files = []
-    for filename in os.listdir(folder_path):
-        if os.path.isfile(os.path.join(folder_path, filename)):
-            files.append(os.path.join(folder_path, filename))
-    return files
 
 
 # Specify the folder path for file uploads and save run with date and time
@@ -79,10 +59,24 @@ if not os.path.exists(upload_folder):
 # Get the list of files in the upload folder
 files = get_files_from_folder(upload_folder)
 
+extension = check_file_extensions(files)
+
+if extension[0] in ['.csv', '.txt']:
+
+    # Get the seperator and check the header
+    sep, header = infer_read_csv_args(files)
+
+    # Read the CSV file using inferred arguments
+    df = pd.read_csv(files, sep=sep, header=header)
+
+    st.dataframe(df)
+
+
+
 
 # Display the file uploader
 uploaded_files = st.file_uploader(
-    "Upload a file", type=["zip"], accept_multiple_files=True
+    "Upload a file", type=["zip", "csv", "txt"], accept_multiple_files=True
 )
 
 if not uploaded_files:
