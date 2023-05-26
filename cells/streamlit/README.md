@@ -1,5 +1,4 @@
-![Asset 2](https://github.com/bioshape-lab/cells/assets/22850980/cf1ca7b1-b9d2-4055-b80d-e2bef7a2e796)
-
+![Asset 3](https://github.com/bioshape-lab/cells/assets/22850980/676529be-3b71-4f68-af14-baa267aeb066)
 
 [![Docker](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml)
 
@@ -160,7 +159,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 The MIT License is a permissive open-source license that allows you to use, modify, and distribute the code in both commercial and non-commercial projects. It provides you with the freedom to adapt the software to your needs, while also offering some protection against liability. It is one of the most commonly used licenses in the open-source community.
 
-## 🙏 Acknowledgments 
+## :raised_hands: Acknowledgments 
 
 This project is extremely grateful for the guidance of Professor Nina Miolane and the members of BioShape lab for their feedback/invaluable discussions.
 
