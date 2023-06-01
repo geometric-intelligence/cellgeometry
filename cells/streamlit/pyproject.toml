@@ -24,3 +24,7 @@ plotly = "^5.14.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+pre-commit = "pre-commit"
+
+[tool.poetry.dev-dependencies]
+black = { version = "*", allow-prereleases = true }

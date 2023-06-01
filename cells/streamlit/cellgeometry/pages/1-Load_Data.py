@@ -3,12 +3,18 @@ import pandas as pd
 import os
 import time
 import matplotlib.pyplot as plt
-
 import sys
+
 
 sys.path.append("/app/utils")
 
-from utils.data_utils import build_rois, find_all_instances, infer_read_csv_args, get_files_from_folder, check_file_extensions
+from utils.data_utils import (
+    build_rois,
+    find_all_instances,
+    infer_read_csv_args,
+    get_files_from_folder,
+    check_file_extensions,
+)
 
 current_time = time.localtime()
 
@@ -27,7 +33,8 @@ st.markdown(
     """
 ## Getting Started
 
-We currently support an ROI zip folder created by FIJI/ImageJ. What this means is you may have a folder structure as follows:
+We currently support an ROI zip folder created by FIJI/ImageJ.
+What this means is you may have a folder structure as follows:
 ```
     └── Cropped_Images
         ├── Bottom_plank_0
@@ -39,13 +46,12 @@ We currently support an ROI zip folder created by FIJI/ImageJ. What this means i
         │   ├── Outlines
         │   └── ROIs  <---- Folder of zipped ROIs
 ```
-You can simply upload this ROIs folder and we will load your data for you. We plan on supporting data given in `xy` coordinate format from `JSON` and CSV/TXT files.
-Your chosen data structure __must__ contain `x` and `y` for the program to correctly parse and load your data.
+You can simply upload this ROIs folder and we will load your data for you.
+We plan on supporting data given in `xy` coordinate format from `JSON` and CSV/TXT files.
+Your chosen data structure __must__ contain `x` and `y` for the program to correctly parse
+and load your data.
 """
 )
-
-
-
 
 
 # Specify the folder path for file uploads and save run with date and time
@@ -69,8 +75,8 @@ uploaded_files = st.file_uploader(
 
 
 if not uploaded_files:
-  st.warning('Please upload a zipped file of ROIs')
-  st.stop()
+    st.warning("Please upload a zipped file of ROIs")
+    st.stop()
 
 
 # Process the uploaded files
@@ -89,7 +95,6 @@ if uploaded_files is not None:
         # st.write(f"File saved: {file_path}")
 
 
-
 # Get the list of files in the upload folder
 files = get_files_from_folder(upload_folder)
 
@@ -97,7 +102,7 @@ files = get_files_from_folder(upload_folder)
 extension = check_file_extensions(files)
 
 
-if extension[0] in ['.csv', '.txt']:
+if extension[0] in [".csv", ".txt"]:
 
     # Get the seperator and check the header
     sep, header = infer_read_csv_args(files[0])
@@ -120,9 +125,9 @@ else:
 
     # Sanity check visualization
     cell_num = st.number_input(
-        f"Visualize a cell. Pick a number between 0 and {len(cells_list)-1}", min_value=0
+        f"Visualize a cell. Pick a number between 0 and {len(cells_list)-1}",
+        min_value=0,
     )
-
 
     fig, ax = plt.subplots()
     ax.plot(cells_list[cell_num][:, 0], cells_list[cell_num][:, 1])
