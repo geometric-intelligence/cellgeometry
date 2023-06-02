@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 
 
-
 def build_rois(path) -> dict:
     """
     Builds a dictionary of region of interest (ROI) data from a directory of ROI files.
@@ -104,8 +103,6 @@ def find_all_instances(dictionary, target_key1, target_key2, results_list):
         )
 
 
-
-
 def get_files_from_folder(folder_path):
     """
     Retrieves a list of files from a specific folder.
@@ -129,15 +126,13 @@ def get_files_from_folder(folder_path):
     return files
 
 
-
-
 def infer_read_csv_args(file_path):
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         # Read the first line of the file
         first_line = file.readline()
 
         # Check for potential delimiters (sep)
-        delimiters = [',', ';', '\t', '|']  # List of potential delimiters
+        delimiters = [",", ";", "\t", "|"]  # List of potential delimiters
         sep = None
 
         for delimiter in delimiters:
@@ -146,19 +141,87 @@ def infer_read_csv_args(file_path):
                 break
 
         # Check for header row (header)
-        header = 'infer' if pd.read_csv(file_path, nrows=2).shape[0] == 2 else None
+        header = "infer" if pd.read_csv(file_path, nrows=2).shape[0] == 2 else None
 
     return sep, header
 
 
-
 def check_file_extensions(file_paths):
-    valid_extensions = ['.zip', '.txt', '.csv']
+    valid_extensions = [".zip", ".txt", ".csv"]
     file_extensions = []
 
     for file_path in file_paths:
-        extension = file_path[file_path.rfind('.'):].lower()
+        extension = file_path[file_path.rfind(".") :].lower()
         if extension in valid_extensions:
             file_extensions.append(extension)
 
     return file_extensions
+
+
+def parse_coordinates(file_path):
+    """
+    Parses a text file containing x-y coordinates of cells separated by line breaks.
+    Each cell's coordinates are stored as a NumPy array in a dictionary.
+
+    Args:
+        file_path (str): The path to the input text file.
+
+    Returns:
+        dict: A dictionary where the keys represent cell IDs and the values are NumPy arrays of coordinates.
+
+    Example:
+        Given the following input file ('coordinates.txt'):
+
+        250 -553
+        253 -553
+        253 -552
+        254 -551
+        254 -546
+
+        250 -553
+        253 -553
+        253 -552
+        254 -551
+        254 -546
+
+        The function call `parse_coordinates('coordinates.txt')` would return:
+
+        {
+            1: np.array([[250, -553],
+                         [253, -553],
+                         [253, -552],
+                         [254, -551],
+                         [254, -546]]),
+            2: np.array([[250, -553],
+                         [253, -553],
+                         [253, -552],
+                         [254, -551],
+                         [254, -546]])
+        }
+    """
+    coordinates = {}
+
+    with open(file_path, "r") as file:
+        cell_id = 1
+        cell_data = []
+
+        for line in file:
+            line = line.strip()
+
+            if line:
+                try:
+                    x, y = map(int, line.split())
+                    cell_data.append([x, y])
+                except ValueError:
+                    print(f"Skipping invalid line: {line}")
+            else:
+                if cell_data:
+                    coordinates[cell_id] = np.array(cell_data)
+                    cell_id += 1
+                    cell_data = []
+
+    # Handle the last cell if it doesn't have a line break after it
+    if cell_data:
+        coordinates[cell_id] = np.array(cell_data)
+
+    return coordinates

@@ -4,6 +4,7 @@ import os
 import time
 import matplotlib.pyplot as plt
 import sys
+import plotly.graph_objects as go
 
 
 sys.path.append("/app/utils")
@@ -14,6 +15,7 @@ from utils.data_utils import (
     infer_read_csv_args,
     get_files_from_folder,
     check_file_extensions,
+    parse_coordinates,
 )
 
 current_time = time.localtime()
@@ -22,7 +24,10 @@ year = time.strftime("%Y", current_time)
 day_of_year = time.strftime("%j", current_time)
 time_string = time.strftime("%H%M%S", current_time)
 
-current_time_string = f"{year}{day_of_year}-{time_string}"
+if "current_time_string" not in st.session_state:
+    current_time_string = f"{year}{day_of_year}-{time_string}"
+    st.session_state["current_time_string"] = current_time_string
+
 
 if "cells_list" not in st.session_state:
     st.session_state["cells_list"] = True
@@ -54,18 +59,39 @@ and load your data.
 )
 
 
+# # Global variable to store the file path
+# upload_folder = None
+
+# def handle_file_upload():
+#     global upload_folder
+
+#     # Specify the folder path for file uploads and save run with date and time
+#     upload_folder = f"/app/data/run-{current_time_string}"
+
+#     # Check if the upload folder exists, and create it if it doesn't
+#     if not os.path.exists(upload_folder):
+#         os.makedirs(upload_folder)
+#         st.info(f"Upload folder created: {upload_folder}")
+
+#     # Example: Print the file path
+#     st.write("Uploaded File Path:", upload_folder)
+
 # Specify the folder path for file uploads and save run with date and time
-upload_folder = f"/app/data/run-{current_time_string}"
+upload_folder = f"/app/data/run-{st.session_state.current_time_string}"
 
 # Check if the upload folder exists, and create it if it doesn't
 if not os.path.exists(upload_folder):
     os.makedirs(upload_folder)
+    st.session_state["upload_folder"] = upload_folder
     st.info(f"Upload folder created: {upload_folder}")
 
 
 # Display the file uploader
 uploaded_files = st.file_uploader(
-    "Upload a file", type=["zip", "csv", "txt"], accept_multiple_files=True
+    "Upload a file",
+    type=["zip", "csv", "txt"],
+    accept_multiple_files=True,
+    key="file_uploader",
 )
 
 
@@ -73,10 +99,10 @@ uploaded_files = st.file_uploader(
 #   st.warning('Please upload a zipped file of ROIs')
 #   st.stop()
 
-
-if not uploaded_files:
-    st.warning("Please upload a zipped file of ROIs")
-    st.stop()
+if st.session_state["cells_list"] == True:
+    if not uploaded_files:
+        st.warning("Please upload a zipped file of ROIs or a CSV/TXT file.")
+        st.stop()
 
 
 # Process the uploaded files
@@ -104,13 +130,15 @@ extension = check_file_extensions(files)
 
 if extension[0] in [".csv", ".txt"]:
 
-    # Get the seperator and check the header
-    sep, header = infer_read_csv_args(files[0])
+    # Build a dictionary of all the ROIs
+    dict_rois = parse_coordinates(files[0])
 
-    # Read the CSV file using inferred arguments
-    df = pd.read_csv(files[0], sep=sep, header=header)
+    # Extract the cells into a list
+    cells_list = list(dict_rois.values())
 
-    st.dataframe(df)
+    st.session_state["cells_list"] = cells_list
+
+    st.success(f"Successfully Loaded {len(cells_list)} cells.", icon="✅")
 
 else:
     # Build a dictionary of all the ROIs
@@ -121,14 +149,45 @@ else:
     find_all_instances(dict_rois, "x", "y", cells_list)
     st.session_state["cells_list"] = cells_list
 
-    st.write(f"Successfully Loaded {len(cells_list)} cells.")
+    st.success(f"Successfully Loaded {len(cells_list)} cells.", icon="✅")
 
-    # Sanity check visualization
-    cell_num = st.number_input(
-        f"Visualize a cell. Pick a number between 0 and {len(cells_list)-1}",
-        min_value=0,
-    )
+st.markdown("## Preview of Cell Data")
 
-    fig, ax = plt.subplots()
-    ax.plot(cells_list[cell_num][:, 0], cells_list[cell_num][:, 1])
-    st.pyplot(fig)
+st.warning(
+    "⚠️ This is a preview your uploaded raw data. We have not preprocessed your data yet to close the curves and remove duplicates. Please continue to the next page to preprocess your data."
+)
+
+# Sanity check visualization
+cell_num = st.number_input(
+    f"Visualize a cell. Pick a number between 0 and {len(cells_list)-1}",
+    min_value=0,
+)
+
+# fig, ax = plt.subplots()
+# ax.plot(cells_list[cell_num][:, 0], cells_list[cell_num][:, 1])
+# st.pyplot(fig)
+
+
+# Define a custom color for the line plot
+line_color = "rgb(31, 119, 180)"  # Adjust the RGB values as per your preference
+
+# Create a trace for the cell data
+trace = go.Scatter(
+    x=cells_list[cell_num][:, 0],
+    y=cells_list[cell_num][:, 1],
+    mode="lines",
+    line=dict(color=line_color),
+)
+
+# Create the layout for the plot
+layout = go.Layout(
+    title="Cell Data",
+    xaxis=dict(title="X"),
+    yaxis=dict(title="Y"),
+)
+
+# Create the Figure object and add the trace to it
+fig = go.Figure(data=trace, layout=layout)
+
+# Display the Plotly figure using Streamlit
+st.plotly_chart(fig)

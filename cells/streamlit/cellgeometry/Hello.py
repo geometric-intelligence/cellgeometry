@@ -11,7 +11,7 @@ st.sidebar.success("Select a demo above.")
 
 st.markdown(
     """
-    ![Asset 2](https://github.com/bioshape-lab/cells/assets/22850980/cf1ca7b1-b9d2-4055-b80d-e2bef7a2e796)
+    ![Asset 5](https://github.com/bioshape-lab/cells/assets/22850980/344f448f-84a9-4f06-8527-8ddec210fb31)
     """
 )
 
