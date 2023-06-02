@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import sys
 import plotly.graph_objects as go
 
-
+st.sidebar.header("STEP 1: Load Data")
 sys.path.append("/app/utils")
 
 from utils.data_utils import (

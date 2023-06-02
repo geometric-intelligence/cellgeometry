@@ -18,6 +18,8 @@ from plotly.subplots import make_subplots
 from utils import experimental
 
 
+st.sidebar.header("STEP 3: PCA")
+
 st.write("# Principal Component Analysis (PCA) 👋")
 
 cells = st.session_state["cells"]

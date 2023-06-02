@@ -17,8 +17,9 @@ from plotly.subplots import make_subplots
 from utils import experimental
 
 # st.write(st.session_state["cells_list"])
+st.sidebar.header("STEP 2: Compute Mean Shape")
 
-st.write("# Welcome to the Cell Shear Analysis App! 👋")
+st.write("# Compute Mean Shape :robot:")
 
 st.markdown(
     """
