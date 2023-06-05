@@ -101,6 +101,17 @@ fig = go.Figure(data=trace, layout=layout)
 # Display the Plotly figure using Streamlit
 st.plotly_chart(fig)
 
+st.markdown(
+    """
+
+### Tangent PCA Analysis
+
+Linear dimensionality reduction using
+    Singular Value Decomposition of the
+    Riemannian Log of the data at the tangent space
+    of the Frechet mean.
+    """
+)
 
 # Extract principal component values
 spc1 = pcas["SRV_components"][:, 0]

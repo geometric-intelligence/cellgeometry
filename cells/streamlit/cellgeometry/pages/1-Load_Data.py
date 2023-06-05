@@ -12,7 +12,6 @@ sys.path.append("/app/utils")
 from utils.data_utils import (
     build_rois,
     find_all_instances,
-    infer_read_csv_args,
     get_files_from_folder,
     check_file_extensions,
     parse_coordinates,
