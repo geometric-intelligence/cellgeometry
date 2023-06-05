@@ -44,6 +44,7 @@ jobs:
           # To customize these inputs:
           # See https://github.com/facebook/pysa-action#inputs
           repo-directory: './cells/streamlit'
+          use-poetry: true
           requirements-path: 'pyproject.toml'
           infer-types: true
           include-default-sapp-filters: true
