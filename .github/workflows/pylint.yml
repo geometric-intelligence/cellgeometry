@@ -20,4 +20,4 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        pylint --max-line-length=200 --disable=C0103,C0114,C0115,C0116,C0301,R0903,R0913,R1735 --output-format=colorized --variable-rgx="[a-z_][a-z0-9_]{0,30}$" --function-rgx="[a-z_][a-z0-9_]{0,30}$" --max-branches=15 --import-order-style=app --disable=logging-not-lazy,no-logging-else-logging --ignore-comments=yes --ignore-docstrings=yes $(git ls-files 'cells/streamlit/*.py')
+        pylint --max-line-length=200 --disable=C0103,C0114,C0115,C0116,C0301,R0903,R0913,R1735 --output-format=colorized --variable-rgx="[a-z_][a-z0-9_]{0,30}$" --function-rgx="[a-z_][a-z0-9_]{0,30}$" --max-branches=15 --disable=logging-not-lazy,no-logging-else-logging --ignore-comments=yes --ignore-docstrings=yes $(git ls-files 'cells/streamlit/*.py')
