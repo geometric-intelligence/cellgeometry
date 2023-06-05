@@ -20,8 +20,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  schedule:
-    - cron: '43 2 * * 4'
+
 
 permissions:
     contents: read
@@ -44,7 +43,7 @@ jobs:
         with:
           # To customize these inputs:
           # See https://github.com/facebook/pysa-action#inputs
-          repo-directory: './'
-          requirements-path: 'requirements.txt'
+          repo-directory: './cells/streamlit'
+          requirements-path: 'pyproject.toml'
           infer-types: true
           include-default-sapp-filters: true
