@@ -1,14 +1,6 @@
-import streamlit as st
-import pandas as pd
 import os
 import time
-import matplotlib.pyplot as plt
 import sys
-import plotly.graph_objects as go
-
-st.sidebar.header("STEP 1: Load Data")
-sys.path.append("/app/utils")
-
 from utils.data_utils import (
     build_rois,
     find_all_instances,
@@ -16,6 +8,14 @@ from utils.data_utils import (
     check_file_extensions,
     parse_coordinates,
 )
+import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+import streamlit as st
+
+
+st.sidebar.header("STEP 1: Load Data")
+sys.path.append("/app/utils")
+
 
 current_time = time.localtime()
 
