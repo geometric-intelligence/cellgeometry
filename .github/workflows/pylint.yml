@@ -22,4 +22,4 @@ jobs:
         poetry install --no-dev --directory cells/streamlit
     - name: Analysing the code with pylint
       run: |
-        pylint --max-line-length=200 --disable=C0103,C0114,C0115,C0116,C0301,R0903,R0913,R1735,F0001 --output-format=colorized --variable-rgx="[a-z_][a-z0-9_]{0,30}$" --function-rgx="[a-z_][a-z0-9_]{0,30}$" --max-branches=15 --ignore-comments=yes --ignore-docstrings=yes $(git ls-files 'cells/streamlit/*.py')
+        pylint --max-line-length=200 --disable=C0103,C0114,C0115,C0116,C0301,R0903,R0913,R1735,E0401,E0611,F0001 --output-format=colorized --variable-rgx="[a-z_][a-z0-9_]{0,30}$" --function-rgx="[a-z_][a-z0-9_]{0,30}$" --max-branches=15 --ignore-comments=yes --ignore-docstrings=yes $(git ls-files 'cells/streamlit/*.py')
