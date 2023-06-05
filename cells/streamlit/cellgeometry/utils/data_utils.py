@@ -92,7 +92,7 @@ def find_all_instances(dictionary, target_key1, target_key2, results_list):
     """
     found_keys = set()
     for key, value in dictionary.items():
-        if key == target_key1 or key == target_key2:
+        if key in (target_key1, target_key2):
             found_keys.add(key)
         elif isinstance(value, dict):
             find_all_instances(value, target_key1, target_key2, results_list)

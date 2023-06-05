@@ -1,21 +1,13 @@
-import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-
 import geomstats.backend as gs
 from geomstats.geometry.euclidean import Euclidean
 from geomstats.geometry.discrete_curves import R2, DiscreteCurves, ClosedDiscreteCurves
-
-from geomstats.learning.frechet_mean import FrechetMean
-from geomstats.learning.kmeans import RiemannianKMeans
-from geomstats.learning.mdm import RiemannianMinimumDistanceToMean
 from geomstats.learning.pca import TangentPCA
 from sklearn.decomposition import PCA
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from utils import experimental
+import streamlit as st
 
 
 st.sidebar.header("STEP 3: PCA")
@@ -262,14 +254,10 @@ for i in range(len(feature_weights)):
 layout = go.Layout(
     title="PCA Biplot",
     xaxis=dict(
-        title="PC1 ({}% explained variance)".format(
-            round(explained_variance_ratio[0] * 100, 2)
-        )
+        title=f"PC1 ({round(explained_variance_ratio[0] * 100, 2)}% explained variance)"
     ),
     yaxis=dict(
-        title="PC2 ({}% explained variance)".format(
-            round(explained_variance_ratio[1] * 100, 2)
-        )
+        title=f"PC2 ({round(explained_variance_ratio[1] * 100, 2)}% explained variance)"
     ),
     showlegend=False,
     annotations=annotations,
@@ -327,14 +315,10 @@ for i in range(len(feature_weights)):
 layout = go.Layout(
     title="Tangent PCA Biplot",
     xaxis=dict(
-        title="PC1 ({}% explained variance)".format(
-            round(explained_variance_ratio[0] * 100, 2)
-        )
+        title=f"PC1 ({round(explained_variance_ratio[0] * 100, 2)}% explained variance)"
     ),
     yaxis=dict(
-        title="PC2 ({}% explained variance)".format(
-            round(explained_variance_ratio[1] * 100, 2)
-        )
+        title=f"PC2 ({round(explained_variance_ratio[1] * 100, 2)}% explained variance)"
     ),
     showlegend=False,
     annotations=annotations,

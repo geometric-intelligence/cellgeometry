@@ -6,7 +6,7 @@ max-line-length = 200
 [MESSAGES CONTROL]
 
 # Enable or disable specific pylint messages by message code
-disable = C0103, C0114, C0115, C0116, C0301, R0903, R0913
+disable = C0103, C0114, C0115, C0116, C0301, R0903, R0913, R1735
 
 [TYPECHECK]
 
@@ -40,7 +40,6 @@ max-branches = 15
 
 # Set the import order style (certain, standard, app, or any other custom order)
 # Adjust according to your preference and project conventions
-import-order-style = app
 
 [LOGGING]
 

@@ -8,7 +8,6 @@ from utils.data_utils import (
     check_file_extensions,
     parse_coordinates,
 )
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import streamlit as st
 
