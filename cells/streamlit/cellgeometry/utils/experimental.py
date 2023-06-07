@@ -10,6 +10,10 @@ from skimage import measure
 from skimage.filters import threshold_otsu
 
 M_AMBIENT = 2
+PRESHAPE_SPACE = PreShapeSpace(m_ambient=M_AMBIENT, k_landmarks=k_sampling_points)
+
+PRESHAPE_SPACE.equip_with_group_action("rotations")
+PRESHAPE_SPACE.equip_with_quotient_structure()
 
 
 def img_to_contour(img):
@@ -107,35 +111,63 @@ def _remove_consecutive_duplicates(curve, tol=1e-2):
     return curve
 
 
-def _exhaustive_align(curve, base_curve):
-    """Project a curve in shape space.
+# def _exhaustive_align(curve, base_curve):
+#     """Project a curve in shape space.
 
-    This happens in 2 steps:
-    - remove translation (and scaling?) by projecting in pre-shape space.
-    - remove rotation by exhaustive alignment minimizing the L² distance.
+#     This happens in 2 steps:
+#     - remove translation (and scaling?) by projecting in pre-shape space.
+#     - remove rotation by exhaustive alignment minimizing the L² distance.
+
+#     Returns
+#     -------
+#     aligned_curve : discrete curve
+#     """
+#     n_sampling_points = curve.shape[-2]
+#     preshape = PreShapeSpace(m_ambient=M_AMBIENT, k_landmarks=n_sampling_points)
+
+#     nb_sampling = len(curve)
+#     distances = gs.zeros(nb_sampling)
+#     for shift in range(nb_sampling):
+#         reparametrized = gs.array(
+#             [curve[(i + shift) % nb_sampling] for i in range(nb_sampling)]
+#         )
+#         aligned = preshape.align(point=reparametrized, base_point=base_curve)
+#         distances[shift] = preshape.total_space_metric.norm(
+#             gs.array(aligned) - gs.array(base_curve)
+#         )
+#     shift_min = gs.argmin(distances)
+#     reparametrized_min = gs.array(
+#         [curve[(i + shift_min) % nb_sampling] for i in range(nb_sampling)]
+#     )
+#     aligned_curve = preshape.align(point=reparametrized_min, base_point=base_curve)
+#     return aligned_curve
+
+
+def exhaustive_align(curve, base_curve):
+    """Align curve to base_curve to minimize the L² distance.
 
     Returns
     -------
     aligned_curve : discrete curve
     """
-    n_sampling_points = curve.shape[-2]
-    preshape = PreShapeSpace(m_ambient=M_AMBIENT, k_landmarks=n_sampling_points)
-
     nb_sampling = len(curve)
     distances = gs.zeros(nb_sampling)
+    base_curve = gs.array(base_curve)
     for shift in range(nb_sampling):
-        reparametrized = gs.array(
-            [curve[(i + shift) % nb_sampling] for i in range(nb_sampling)]
+        reparametrized = [curve[(i + shift) % nb_sampling] for i in range(nb_sampling)]
+        aligned = PRESHAPE_SPACE.fiber_bundle.align(
+            point=gs.array(reparametrized), base_point=base_curve
         )
-        aligned = preshape.align(point=reparametrized, base_point=base_curve)
-        distances[shift] = preshape.total_space_metric.norm(
+        distances[shift] = PRESHAPE_SPACE.embedding_space.metric.norm(
             gs.array(aligned) - gs.array(base_curve)
         )
     shift_min = gs.argmin(distances)
-    reparametrized_min = gs.array(
-        [curve[(i + shift_min) % nb_sampling] for i in range(nb_sampling)]
+    reparametrized_min = [
+        curve[(i + shift_min) % nb_sampling] for i in range(nb_sampling)
+    ]
+    aligned_curve = PRESHAPE_SPACE.fiber_bundle.align(
+        point=gs.array(reparametrized_min), base_point=base_curve
     )
-    aligned_curve = preshape.align(point=reparametrized_min, base_point=base_curve)
     return aligned_curve
 
 
