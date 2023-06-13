@@ -134,3 +134,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+cells/notebooks/shear_clean_present.ipynb
+cells/notebooks/rename files.py
