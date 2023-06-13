@@ -29,7 +29,7 @@ def interpolate_dicrete_curve(curve, n_sampling_points):
         pos += incr
     return gs.array(interpolation, dtype=gs.float32)
 
-def get_array_perplank(data_dict: dict, img: str) -> list:
+def get_array_perplank(data_dict: dict, img: str, min_points: int, k_sampling_points: int) -> list:
     """
     Helper function that gets all the cell ROIs for an entire plank.
     
@@ -40,6 +40,10 @@ def get_array_perplank(data_dict: dict, img: str) -> list:
     plank : data-type, optional
         The desired data-type for the array, e.g., `numpy.int8`.  Default is
         `numpy.float64`.
+    min_points : int
+        minimum number of points allowable in a ROI.
+    k_sampling_points : int
+        How many sampling points to interpolate the curve to.
     
     Returns
     -------
@@ -50,10 +54,9 @@ def get_array_perplank(data_dict: dict, img: str) -> list:
     #for img in data_dict:
         # print(data_dict[key]["ROIs"][img].keys())
     for cellnum in data_dict[img].keys():
-        #if (data_dict[img][cellnum]['n'] ) > 30:
-        stacked = np.column_stack([data_dict[img][cellnum]['x'], data_dict[img][cellnum]['y']])
-        planks.append(interpolate_dicrete_curve(stacked, 100))
-        print(length(data_dict[img][cellnum]['x']))
+        if (data_dict[img][cellnum]['n'] ) > min_points:
+            stacked = np.column_stack([data_dict[img][cellnum]['x'], data_dict[img][cellnum]['y']])
+            planks.append(interpolate_dicrete_curve(stacked, k_sampling_points))
     return planks
 
 
