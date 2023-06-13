@@ -50,9 +50,10 @@ def get_array_perplank(data_dict: dict, img: str) -> list:
     #for img in data_dict:
         # print(data_dict[key]["ROIs"][img].keys())
     for cellnum in data_dict[img].keys():
+        #if (data_dict[img][cellnum]['n'] ) > 30:
         stacked = np.column_stack([data_dict[img][cellnum]['x'], data_dict[img][cellnum]['y']])
-        planks.append(interpolate_dicrete_curve(stacked, 50))
-        #print(cellnum)
+        planks.append(interpolate_dicrete_curve(stacked, 100))
+        print(length(data_dict[img][cellnum]['x']))
     return planks
 
 
