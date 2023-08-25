@@ -5,13 +5,13 @@ on:
     branches:
       - main
     paths:
-      - '.github/workflows/publish-docs.yaml'
-      - 'cvapipe-docs/**'
+      - '.github/workflows/deploy-docs.yaml'
+      - 'docs/**'
     # Review gh actions docs if you want to further define triggers, paths, etc
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
 # defaults:
 #   run:
-#     working-directory: ${{ github.workspace }}/cvapipe-docs
+#     working-directory: ${{ github.workspace }}/docs
 
 jobs:
   deploy:
@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: 18
           cache: yarn
-          cache-dependency-path: cvapipe-docs/package-lock.json
+          cache-dependency-path: docs/package-lock.json
 
 
       - name: Install dependencies
@@ -41,7 +41,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Build output to publish to the `gh-pages` branch:
-          publish_dir: ./cvapipe-docs/build
+          publish_dir: ./docs/build
           # The following lines assign commit authorship to the official
           # GH-Actions bot for deploys to `gh-pages` branch:
           # https://github.com/actions/checkout/issues/13#issuecomment-724415212
