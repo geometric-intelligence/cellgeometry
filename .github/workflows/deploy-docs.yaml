@@ -17,7 +17,7 @@ jobs:
   deploy:
     defaults:
       run:
-        working-directory: cvapipe-docs
+        working-directory: docs
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
     steps:
