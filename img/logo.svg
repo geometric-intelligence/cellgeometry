@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1729">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        font-family: Rig-MediumHalftone, 'Rig Solid';
+        font-size: 950px;
+        font-weight: 500;
+      }
+
+      .cls-3 {
+        letter-spacing: 0em;
+      }
+
+      .cls-4 {
+        fill: #e81e26;
+      }
+
+      .cls-2 {
+        fill: #f7f2da;
+      }
+    </style>
+  </defs>
+  <circle class="cls-4" cx="960.5" cy="864.5" r="864.5"/>
+  <g>
+    <text class="cls-1" transform="translate(298.21 1097.09)"><tspan class="cls-3" x="0" y="0">C</tspan><tspan x="623.92" y="0">G</tspan></text>
+    <text class="cls-2" transform="translate(298.21 1097.09)"><tspan class="cls-3" x="0" y="0">C</tspan><tspan x="623.92" y="0">G</tspan></text>
+  </g>
+</svg>
