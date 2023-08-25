@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[842],{5873:e=>{e.exports=JSON.parse('{"label":"hola","permalink":"/cellgeometry/blog/tags/hola","allTagsPath":"/cellgeometry/blog/tags","count":1}')}}]);
