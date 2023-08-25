@@ -8,10 +8,19 @@ import skimage.io as skio
 from geomstats.geometry.pre_shape import PreShapeSpace
 from skimage import measure
 from skimage.filters import threshold_otsu
+import streamlit as st
 
 M_AMBIENT = 2
-PRESHAPE_SPACE = PreShapeSpace(m_ambient=M_AMBIENT, k_landmarks=k_sampling_points)
 
+
+if "n_sampling_points" not in st.session_state:
+    st.session_state["n_sampling_points"] = 50
+    n_sampling_points = st.session_state["n_sampling_points"]
+else:
+    n_sampling_points = st.session_state["n_sampling_points"]
+
+
+PRESHAPE_SPACE = PreShapeSpace(m_ambient=M_AMBIENT, k_landmarks=n_sampling_points)
 PRESHAPE_SPACE.equip_with_group_action("rotations")
 PRESHAPE_SPACE.equip_with_quotient_structure()
 
@@ -143,7 +152,7 @@ def _remove_consecutive_duplicates(curve, tol=1e-2):
 #     return aligned_curve
 
 
-def exhaustive_align(curve, base_curve):
+def _exhaustive_align(curve, base_curve):
     """Align curve to base_curve to minimize the L² distance.
 
     Returns

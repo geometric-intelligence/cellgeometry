@@ -1,14 +1,13 @@
 import geomstats.backend as gs
 from geomstats.geometry.euclidean import Euclidean
-from geomstats.geometry.discrete_curves import R2, DiscreteCurves, ClosedDiscreteCurves
-
+from geomstats.geometry.discrete_curves import DiscreteCurves
+from geomstats.geometry.discrete_curves import DiscreteCurves, ClosedDiscreteCurves
 from geomstats.learning.frechet_mean import FrechetMean
-
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-
 from utils import experimental
 import streamlit as st
+
 
 st.sidebar.header("STEP 2: Compute Mean Shape")
 
@@ -26,14 +25,15 @@ st.markdown(
 """
 )
 
-upload_folder = st.session_state["upload_folder"]
-if not upload_folder:
+if "upload_folder" not in st.session_state:
     st.warning("👈 Please upload a zipped file of ROIs under Load Data")
     st.stop()
 
+upload_folder = st.session_state["upload_folder"]
 cells_list = st.session_state["cells_list"]
 
 n_sampling_points = st.slider("Select the Number of Sampling Points", 0, 100, 50)
+st.session_state["n_sampling_points"] = n_sampling_points
 cells, cell_shapes = experimental.nolabel_preprocess(
     cells_list, len(cells_list), n_sampling_points
 )
@@ -42,10 +42,10 @@ st.session_state["cells"] = cells
 st.session_state["cell_shapes"] = cell_shapes
 
 R1 = Euclidean(dim=1)
-CLOSED_CURVES_SPACE = ClosedDiscreteCurves(R2)
-CURVES_SPACE = DiscreteCurves(R2)
-SRV_METRIC = CURVES_SPACE.srv_metric
-L2_METRIC = CURVES_SPACE.l2_curves_metric
+CLOSED_CURVES_SPACE = ClosedDiscreteCurves(Euclidean(dim=2))
+CURVES_SPACE = DiscreteCurves(Euclidean(dim=2), k_sampling_points=n_sampling_points)
+# SRV_METRIC = CURVES_SPACE.srv_metric
+# L2_METRIC = CURVES_SPACE.l2_curves_metric
 
 ELASTIC_METRIC = {}
 
@@ -61,7 +61,9 @@ BS = [float(num) for num in input_string_BS.split(",")]
 
 
 for a, b in zip(AS, BS):
-    ELASTIC_METRIC[a, b] = DiscreteCurves(R2, a=a, b=b).elastic_metric
+    ELASTIC_METRIC[a, b] = CURVES_SPACE.metric.geodesic(
+        initial_point=a, end_point=b
+    )  # .elastic_metric
 METRICS = {}
 METRICS["Linear"] = L2_METRIC
 METRICS["SRV"] = SRV_METRIC
