@@ -1,0 +1,42 @@
+# Exclude common development and system files
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.swp
+.vscode/
+*.idea/
+*.git/
+*.gitignore
+.DS_Store
+*.log
+*.csv
+
+# Exclude virtual environment files
+venv/
+env/
+*.egg-info/
+
+# Exclude development and test-related files
+tests/
+test/
+*.test.py
+*.pytest_cache/
+
+# Exclude build and cache files
+.build/
+__pycache__/
+dist/
+*.egg/
+*.egg-info/
+*.pyc
+*.pyo
+*.pyd
+
+# Exclude Streamlit's internal cache
+streamlit/__pycache__/
+streamlit/.streamlit/
+streamlit/.st_folder/
+
+# Exclude any other files or directories specific to your application
+data
