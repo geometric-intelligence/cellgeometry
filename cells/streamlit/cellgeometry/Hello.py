@@ -8,7 +8,7 @@ from streamlit.web.server.websocket_headers import _get_websocket_headers
 headers = _get_websocket_headers()
 access_token = headers.get("X-Forwarded-User")
 st.session_state["username"] = access_token
-st.success(f"Successfully logged in as __{access_token}__", icon="✅")
+# st.success(f"Successfully logged in as __{access_token}__", icon="✅")
 
 st.set_page_config(
     page_title="Welcome to Cell Shape Analysis",

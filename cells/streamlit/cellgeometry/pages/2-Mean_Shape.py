@@ -11,7 +11,10 @@ import streamlit as st
 
 st.sidebar.header("STEP 2: Compute Mean Shape")
 
-st.write("# Compute Mean Shape :robot:")
+st.write("# Compute Mean Shape")
+
+# Display the uploaded data
+st.info(f"Uploaded data: {st.session_state['upload_folder']}")
 
 st.markdown(
     """

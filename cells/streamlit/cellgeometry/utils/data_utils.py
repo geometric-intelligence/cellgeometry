@@ -2,6 +2,7 @@ import os
 from read_roi import read_roi_zip
 import numpy as np
 import pandas as pd
+import streamlit as st
 
 
 def build_rois(path) -> dict:
@@ -20,6 +21,7 @@ def build_rois(path) -> dict:
         >>> print(rois)
         {'roi1': <ROI data>, 'roi2': <ROI data>, ...}
     """
+    st.write(os.listdir(path))
     rois = {}
     for roi in sorted(os.listdir(path)):
         # print(roi.split(".")[0])
