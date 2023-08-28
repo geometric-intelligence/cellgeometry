@@ -22,6 +22,9 @@ EXPOSE 8501
 # Set the PYTHONPATH environment variable
 ENV PYTHONPATH "${PYTHONPATH}:/app/utils"
 
+# The HEALTHCHECK instruction tells Docker how to test a container to check that it is still working
+HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+
 # Set the entrypoint command to run the Streamlit app
 CMD ["streamlit", "run", "Hello.py", "--server.port=8501"]
 
