@@ -1,37 +1,22 @@
-import os
-import subprocess
+import sys
 import geomstats.backend as gs
-import streamlit as st
-import time
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy import stats
-
-from sklearn.cluster import KMeans
-from sklearn.metrics import confusion_matrix
-from sklearn.decomposition import PCA
-
-from scipy.optimize import linear_sum_assignment as linear_assignment
-from sklearn import manifold
-from joblib import Parallel, delayed
-from numba import jit, njit, prange
 
 from geomstats.geometry.euclidean import Euclidean
 from geomstats.geometry.discrete_curves import R2, DiscreteCurves, ClosedDiscreteCurves
 
 from geomstats.learning.frechet_mean import FrechetMean
-from geomstats.learning.kmeans import RiemannianKMeans
-from geomstats.learning.mdm import RiemannianMinimumDistanceToMean
-from geomstats.learning.pca import TangentPCA
-
-import sys
-
-sys.path.append("/app/utils")
 
 # import utils
 from utils import experimental as experimental
 from utils import basic as basic
+import streamlit as st
+
+
+sys.path.append("/app/utils")
 
 
 st.set_page_config(

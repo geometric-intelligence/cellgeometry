@@ -1,0 +1,47 @@
+package:
+  name: cellgeometry
+  version: 0.1.3
+
+source:
+  git_url: https://github.com/bioshape-lab/cellgeometry.git
+
+build:
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  build:
+    - python >=3.10
+    - pip
+  host:
+    - python >=3.10
+  run:
+    - python >=3.10
+    - streamlit >=1.21.0
+    - numpy 1.23.0
+    - geomstats >=2.5.0
+    - scikit-image >=0.20.0
+    - matplotlib >=3.7.1
+    - numba >=0.56.4
+    - autograd >=1.5
+    - read-roi >=1.6.0
+    - plotly >=5.14.1
+
+test:
+  imports:
+    - cellgeometry
+
+about:
+  home: https://github.com/bioshape-lab/cellgeometry/tree/main/cells/streamlit
+  license: MIT
+  license_file: LICENSE
+  summary: Statistical Cell Shape Analysis
+  description: |
+    Cell Geometry is a Python package for the statistical analysis of cell shapes.
+  doc_url: https://github.com/bioshape-lab/cellgeometry/tree/main/cells/streamlit
+  dev_url: https://github.com/bioshape-lab/cellgeometry/tree/main/cells/streamlit
+
+extra:
+  recipe-maintainers:
+    - Amil Khan
+    - Samuel Feinstein
+    - Nina Miolane
