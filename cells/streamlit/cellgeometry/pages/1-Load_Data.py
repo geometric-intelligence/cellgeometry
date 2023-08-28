@@ -97,45 +97,6 @@ def build_and_load_data(upload_folder):
         st.success(f"Successfully Loaded {len(cells_list)} cells.", icon="✅")
 
 
-def previewVisualization(cells_list):
-
-    st.markdown("## Preview of Cell Data")
-
-    st.warning(
-        "⚠️ This is a preview your uploaded raw data. We have not preprocessed your data yet to close the curves and remove duplicates. Please continue to the next page to preprocess your data."
-    )
-
-    # Sanity check visualization
-    cell_num = st.number_input(
-        f"Visualize a cell. Pick a number between 0 and {len(cells_list)-1}",
-        min_value=0,
-    )
-
-    # Define a custom color for the line plot
-    line_color = "rgb(31, 119, 180)"  # Adjust the RGB values as per your preference
-
-    # Create a trace for the cell data
-    trace = go.Scatter(
-        x=cells_list[0][:, 0],
-        y=cells_list[0][:, 1],
-        mode="lines",
-        line=dict(color=line_color),
-    )
-
-    # Create the layout for the plot
-    layout = go.Layout(
-        title="Cell Data",
-        xaxis=dict(title="X"),
-        yaxis=dict(title="Y"),
-    )
-
-    # Create the Figure object and add the trace to it
-    fig = go.Figure(data=trace, layout=layout)
-
-    # Display the Plotly figure using Streamlit
-    st.plotly_chart(fig)
-
-
 # def handle_uploaded_files(uploaded_files, destination_folder):
 #     progress_bar = st.progress(0)
 #     total_files = len(uploaded_files)
@@ -199,7 +160,7 @@ if config_option == "Upload a File":
                     handle_uploaded_file(uploaded_file, upload_folder)
 
             build_and_load_data(st.session_state["upload_folder"])
-            previewVisualization(st.session_state["cells_list"])
+            # previewVisualization(st.session_state["cells_list"])
 
 elif config_option == "Choose an Uploaded File":
     if upload_folder and os.path.exists(upload_folder):
@@ -213,13 +174,80 @@ elif config_option == "Choose an Uploaded File":
             st.session_state["selected_dataset"] = selected_file
             st.info(f"You selected {selected_file}")
             build_and_load_data(upload_folder)
-            previewVisualization(st.session_state["cells_list"])
+            # previewVisualization(st.session_state["cells_list"])
         else:
             st.warning("No files found in the directory!")
     else:
         st.warning("No files have been uploaded yet.")
 
 
+st.markdown("## Preview of Cell Data")
+
+st.warning(
+    "⚠️ This is a preview your uploaded raw data. We have not preprocessed your data yet to close the curves and remove duplicates. Please continue to the next page to preprocess your data."
+)
+
+# Sanity check visualization
+cell_num = st.number_input(
+    f"Visualize a cell. Pick a number between 0 and {len(st.session_state.cells_list)-1}",
+    min_value=0,
+)
+
+# Sample data. Replace this with st.session_state.cells_list[cell_num]
+x_data = st.session_state.cells_list[cell_num][:, 0]
+y_data = st.session_state.cells_list[cell_num][:, 1]
+z_data = [0] * len(
+    x_data
+)  # Using a constant value for z, placing the line on the "floor" of the 3D space
+
+# Define a custom color for the line plot
+line_color = "rgb(31, 119, 180)"  # Adjust the RGB values as per your preference
+
+# Create a 3D trace for the cell data
+trace = go.Scatter3d(
+    x=x_data,
+    y=y_data,
+    z=z_data,
+    mode="lines",
+    line=dict(color=line_color),
+)
+
+# Create the layout for the 3D plot
+layout = go.Layout(
+    title="Preview of 2D Cell Data in 3D Space",
+    scene=dict(xaxis_title="X", yaxis_title="Y", zaxis_title="Z"),
+)
+
+# Create the Figure object and add the trace to it
+fig = go.Figure(data=trace, layout=layout)
+
+# Display the Plotly figure using Streamlit
+st.plotly_chart(fig)
+# # Define a custom color for the line plot
+# line_color = "rgb(31, 119, 180)"  # Adjust the RGB values as per your preference
+
+# # Create a trace for the cell data
+# trace = go.Scatter(
+#     x=st.session_state.cells_list[cell_num][:, 0],
+#     y=st.session_state.cells_list[cell_num][:, 1],
+#     mode="lines",
+#     line=dict(color=line_color),
+# )
+
+# # Create the layout for the plot
+# layout = go.Layout(
+#     title="Preview of Cell Data",
+#     xaxis=dict(title="X"),
+#     yaxis=dict(title="Y"),
+# )
+
+# # Create the Figure object and add the trace to it
+# fig = go.Figure(data=trace, layout=layout)
+
+# # Display the Plotly figure using Streamlit
+# st.plotly_chart(fig)
+
+st.dataframe(st.session_state.cells_list[cell_num])
 # config_option = st.radio(
 #     "Select a Configuration File Option", ("Upload", "Choose a File")
 # )

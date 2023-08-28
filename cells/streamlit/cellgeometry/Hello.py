@@ -34,6 +34,16 @@ st.markdown(
 
 st.markdown(
     """
+    <meta property="og:title" content="CellGeometry">
+    <meta property="og:description" content="A web-based app for Cell Shape Analysis">
+    <meta property="og:image" content="https://raw.githubusercontent.com/bioshape-lab/cellgeometry/299d08de1aa3a1b3431ccd202f1e87530d2fd722/docs/static/img/cg-social-card-01.png">
+    <meta property="og:url" content="https://cellgeometry.ece.ucsb.edu">
+    """,
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    """
     ## 📝 Project Description
 
     This project focuses on the analysis and comparison of biological cell shapes using elastic metrics implemented in Geomstats. The shapes of biological cells are determined by various processes and biophysical forces, which play a crucial role in cellular functions. By utilizing quantitative measures that reflect cellular morphology, this project aims to leverage large-scale biological cell image data for morphological studies.

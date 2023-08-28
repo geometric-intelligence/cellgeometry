@@ -1,6 +1,5 @@
 import geomstats.backend as gs
 from geomstats.geometry.euclidean import Euclidean
-from geomstats.geometry.discrete_curves import DiscreteCurves
 from geomstats.geometry.discrete_curves import DiscreteCurves, ClosedDiscreteCurves
 from geomstats.learning.frechet_mean import FrechetMean
 import plotly.graph_objects as go
