@@ -11,6 +11,16 @@ def perimeter(xy):
     xy : array-like, shape=[n_points, 2]
         Polygon, such that:
         x = xy[:, 0]; y = xy[:, 1]
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> xy = np.array([[0, 0], [0, 1], [1, 1], [1, 0]])
+    >>> np.isclose(perimeter(xy), 4.0)
+    True
+    >>> xy = np.array([[0, 0], [0, 3], [4, 3], [4, 0]])
+    >>> np.isclose(perimeter(xy), 14.0)
+    True
     """
     first_point = gs.expand_dims(gs.array(xy[0]), axis=0)
     xy1 = gs.concatenate([xy[1:], first_point], axis=0)

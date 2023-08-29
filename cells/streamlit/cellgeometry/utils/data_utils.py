@@ -227,3 +227,36 @@ def parse_coordinates(file_path):
         coordinates[cell_id] = np.array(cell_data)
 
     return coordinates
+
+
+def get_file_or_folder_type(path):
+    """Determine whether a given path points to a file, a folder, or neither.
+
+    Parameters
+    ----------
+    path : str
+        The path to the item (file or folder) you want to check.
+
+    Returns
+    -------
+    str
+        A string indicating the type of the item:
+        - 'File' if the path points to a file.
+        - 'Folder' if the path points to a folder.
+        - 'Neither' if the path does not point to a file or folder.
+
+    Examples
+    --------
+    >>> get_file_or_folder_type('/path/to/your/selected/file_or_folder')
+    'Folder'
+    >>> get_file_or_folder_type('/path/to/your/selected/example.txt')
+    'File'
+    >>> get_file_or_folder_type('/path/to/nonexistent/item')
+    'Neither'
+    """
+    if os.path.isfile(path):
+        return ":page_facing_up: File"
+    elif os.path.isdir(path):
+        return ":file_folder: Folder"
+    else:
+        return "Neither"

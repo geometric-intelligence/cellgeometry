@@ -7,6 +7,7 @@ from utils.data_utils import (
     get_files_from_folder,
     check_file_extensions,
     parse_coordinates,
+    get_file_or_folder_type,
 )
 import plotly.graph_objects as go
 import streamlit as st
@@ -22,6 +23,7 @@ username = st.session_state["username"]
 # REMOVE BRUH
 if username is None:
     username = "bruh"
+    st.session_state["username"] = username
 #########################################
 
 current_time = time.localtime()
@@ -163,22 +165,57 @@ if config_option == "Upload a File":
             # previewVisualization(st.session_state["cells_list"])
 
 elif config_option == "Choose an Uploaded File":
+
     if upload_folder and os.path.exists(upload_folder):
+
+        # List all files in the directory
+        # files = [f for f in os.listdir(upload_folder) if os.path.isfile(os.path.join(upload_folder, f))]
+
         files = [
             f
             for f in os.listdir(upload_folder)
-            if os.path.isfile(os.path.join(upload_folder, f))
+            if os.path.exists(os.path.join(upload_folder, f))
         ]
-        if files:
-            selected_file = st.selectbox("Select a previously uploaded file:", files)
-            st.session_state["selected_dataset"] = selected_file
-            st.info(f"You selected {selected_file}")
-            build_and_load_data(upload_folder)
-            # previewVisualization(st.session_state["cells_list"])
-        else:
+
+        if not files:
             st.warning("No files found in the directory!")
+            # st.stop()
+
+        # Display the files in a dropdown
+        selected_file = st.selectbox("Choose a file:", files)
+        st.session_state["selected_dataset"] = os.path.join(
+            upload_folder, selected_file
+        )
+        selection_type = get_file_or_folder_type(st.session_state["selected_dataset"])
+        build_and_load_data(st.session_state["selected_dataset"])
+        st.info(f"{selection_type} Selected: {selected_file}")
+
+        # if "Folder" in selection_type:
+
+        #     selected_folder_files = [f for f in os.listdir(st.session_state["selected_dataset"]) if os.path.isfile(os.path.join(st.session_state["selected_dataset"], f))]
+        #     view_selected_folder_files = st.selectbox("Choose a file:", selected_folder_files)
+
+        # files = [
+        #     f
+        #     for f in os.listdir(upload_folder)
+        #     if os.path.isfile(os.path.join(upload_folder, f))
+        # ]
+        # st.write(files)
+        # if files:
+        #     selected_file = st.selectbox("Select a previously uploaded file:", files)
+        #     st.session_state["selected_dataset"] = selected_file
+        #     st.info(f"You selected {selected_file}")
+        #     build_and_load_data(upload_folder)
+        #     # previewVisualization(st.session_state["cells_list"])
+        # else:
+        #     st.warning("No files found in the directory!")
     else:
         st.warning("No files have been uploaded yet.")
+
+
+if st.session_state.cells_list == True:
+    st.warning("Please upload a zipped file of ROIs or a CSV/TXT file.")
+    st.stop()
 
 
 st.markdown("## Preview of Cell Data")
@@ -186,6 +223,12 @@ st.markdown("## Preview of Cell Data")
 st.warning(
     "⚠️ This is a preview your uploaded raw data. We have not preprocessed your data yet to close the curves and remove duplicates. Please continue to the next page to preprocess your data."
 )
+
+(
+    col1,
+    col2,
+) = st.columns(2)
+
 
 # Sanity check visualization
 cell_num = st.number_input(
@@ -201,7 +244,7 @@ z_data = [0] * len(
 )  # Using a constant value for z, placing the line on the "floor" of the 3D space
 
 # Define a custom color for the line plot
-line_color = "rgb(31, 119, 180)"  # Adjust the RGB values as per your preference
+line_color = "rgb(255, 0, 191)"  # Adjust the RGB values as per your preference
 
 # Create a 3D trace for the cell data
 trace = go.Scatter3d(
