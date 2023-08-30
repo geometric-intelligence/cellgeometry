@@ -203,6 +203,7 @@ def preprocess(
     n_sampling_points : int
         Number of sampling points along the boundary of each cell.
     """
+
     if n_cells > 0:
         print(f"... Selecting only a random subset of {n_cells} / {len(cells)} cells.")
         indices = sorted(
@@ -280,38 +281,45 @@ def nolabel_preprocess(
     #     labels_a = [labels_a[idx] for idx in indices]
     #     labels_b = [labels_b[idx] for idx in indices]
 
-    if n_sampling_points > 0:
-        print(
-            "... Interpolating: "
-            f"Cell boundaries have {n_sampling_points} samplings points."
-        )
-        interpolated_cells = gs.zeros((n_cells, n_sampling_points, 2))
+    with st.status("Preprocessing data...", expanded=True) as status:
+
+        if n_sampling_points > 0:
+            st.write(
+                "Interpolating: "
+                f"Cell boundaries have {n_sampling_points} samplings points."
+            )
+            interpolated_cells = gs.zeros((n_cells, n_sampling_points, 2))
+            for i_cell, cell in enumerate(cells):
+                interpolated_cells[i_cell] = _interpolate(cell, n_sampling_points)
+
+            cells = interpolated_cells
+
+        st.write("Removing potential duplicate sampling points on cell boundaries.")
         for i_cell, cell in enumerate(cells):
-            interpolated_cells[i_cell] = _interpolate(cell, n_sampling_points)
+            cells[i_cell] = _remove_consecutive_duplicates(cell)
 
-        cells = interpolated_cells
+        st.write("Cells: Quotienting Translation.")
+        print("\n- ")
+        cells = cells - gs.mean(cells, axis=-2)[..., None, :]
+        cell_shapes = gs.zeros_like(cells)
 
-    print("... Removing potential duplicate sampling points on cell boundaries.")
-    for i_cell, cell in enumerate(cells):
-        cells[i_cell] = _remove_consecutive_duplicates(cell)
+        if "scaling" in quotient:
+            st.write("Cell shapes: quotienting scaling (length).")
+            for i_cell, cell in enumerate(cells):
+                cell_shapes[i_cell] = cell / basic.perimeter(cell)
 
-    print("\n- Cells: quotienting translation.")
-    cells = cells - gs.mean(cells, axis=-2)[..., None, :]
+        if "rotation" in quotient:
 
-    cell_shapes = gs.zeros_like(cells)
-    if "scaling" in quotient:
-        print("- Cell shapes: quotienting scaling (length).")
-        for i_cell, cell in enumerate(cells):
-            cell_shapes[i_cell] = cell / basic.perimeter(cell)
+            st.write("Cell shapes: Quotienting Rotation.")
+            # print("- Cell shapes: quotienting rotation.")
+            if "scaling" not in quotient:
+                for i_cell, cell_shape in enumerate(cells):
+                    cell_shapes[i_cell] = _exhaustive_align(cell_shape, cells[0])
+            else:
+                for i_cell, cell_shape in enumerate(cell_shapes):
+                    cell_shapes[i_cell] = _exhaustive_align(cell_shape, cell_shapes[0])
 
-    if "rotation" in quotient:
-        print("- Cell shapes: quotienting rotation.")
-        if "scaling" not in quotient:
-            for i_cell, cell_shape in enumerate(cells):
-                cell_shapes[i_cell] = _exhaustive_align(cell_shape, cells[0])
-        else:
-            for i_cell, cell_shape in enumerate(cell_shapes):
-                cell_shapes[i_cell] = _exhaustive_align(cell_shape, cell_shapes[0])
+        status.update(label="Preprocessing complete!", state="complete", expanded=False)
 
     return cells, cell_shapes  # , labels_a, labels_b
 

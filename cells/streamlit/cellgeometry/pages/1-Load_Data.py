@@ -69,9 +69,11 @@ and load your data.
 
 def build_and_load_data(upload_folder):
 
-    # Get the list of files in the upload folder
-    files = get_files_from_folder(upload_folder)
-
+    if "Folder" in get_file_or_folder_type(upload_folder):
+        # Get the list of files in the upload folder
+        files = get_files_from_folder(upload_folder)
+    else:
+        files = [upload_folder]
     # Check the file extensions
     extension = check_file_extensions(files)
 
@@ -156,21 +158,19 @@ if config_option == "Upload a File":
                     new_upload_folder = os.path.join(
                         upload_folder, "ROIs-" + st.session_state["current_time_string"]
                     )
-                    st.session_state["upload_folder"] = new_upload_folder
+                    st.session_state["selected_dataset"] = new_upload_folder
                     handle_uploaded_file(uploaded_file, new_upload_folder)
                 else:
                     handle_uploaded_file(uploaded_file, upload_folder)
 
-            build_and_load_data(st.session_state["upload_folder"])
-            # previewVisualization(st.session_state["cells_list"])
+            build_and_load_data(st.session_state["selected_dataset"])
+
 
 elif config_option == "Choose an Uploaded File":
 
     if upload_folder and os.path.exists(upload_folder):
 
-        # List all files in the directory
-        # files = [f for f in os.listdir(upload_folder) if os.path.isfile(os.path.join(upload_folder, f))]
-
+        # List all files and folders in the directory
         files = [
             f
             for f in os.listdir(upload_folder)
@@ -266,31 +266,10 @@ fig = go.Figure(data=trace, layout=layout)
 
 # Display the Plotly figure using Streamlit
 st.plotly_chart(fig)
-# # Define a custom color for the line plot
-# line_color = "rgb(31, 119, 180)"  # Adjust the RGB values as per your preference
-
-# # Create a trace for the cell data
-# trace = go.Scatter(
-#     x=st.session_state.cells_list[cell_num][:, 0],
-#     y=st.session_state.cells_list[cell_num][:, 1],
-#     mode="lines",
-#     line=dict(color=line_color),
-# )
-
-# # Create the layout for the plot
-# layout = go.Layout(
-#     title="Preview of Cell Data",
-#     xaxis=dict(title="X"),
-#     yaxis=dict(title="Y"),
-# )
-
-# # Create the Figure object and add the trace to it
-# fig = go.Figure(data=trace, layout=layout)
-
-# # Display the Plotly figure using Streamlit
-# st.plotly_chart(fig)
 
 st.dataframe(st.session_state.cells_list[cell_num])
+
+
 # config_option = st.radio(
 #     "Select a Configuration File Option", ("Upload", "Choose a File")
 # )

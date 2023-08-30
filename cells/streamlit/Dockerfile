@@ -13,6 +13,8 @@ RUN pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
     poetry install --no-dev
 
+RUN pip install git+https://github.com/geomstats/geomstats.git
+
 # Copy the entire project directory into the container
 COPY cellgeometry .
 

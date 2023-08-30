@@ -12,8 +12,12 @@ st.sidebar.header("STEP 2: Compute Mean Shape")
 
 st.write("# Compute Mean Shape")
 
+if not st.session_state["selected_dataset"]:
+    st.warning("👈 Please upload a zipped file of ROIs under Load Data")
+    st.stop()
+
 # Display the uploaded data
-st.info(f"Uploaded data: {st.session_state['upload_folder']}")
+st.info(f"Uploaded data: {st.session_state['selected_dataset']}")
 
 st.markdown(
     """
@@ -27,64 +31,62 @@ st.markdown(
 """
 )
 
-if "upload_folder" not in st.session_state:
-    st.warning("👈 Please upload a zipped file of ROIs under Load Data")
-    st.stop()
 
-upload_folder = st.session_state["upload_folder"]
+upload_folder = st.session_state["selected_dataset"]
 cells_list = st.session_state["cells_list"]
 
-n_sampling_points = st.slider("Select the Number of Sampling Points", 0, 100, 50)
+n_sampling_points = st.slider("Select the Number of Sampling Points", 0, 250, 50)
 st.session_state["n_sampling_points"] = n_sampling_points
 cells, cell_shapes = experimental.nolabel_preprocess(
     cells_list, len(cells_list), n_sampling_points
 )
-
+st.write(cell_shapes.shape)
 st.session_state["cells"] = cells
 st.session_state["cell_shapes"] = cell_shapes
 
+
 R1 = Euclidean(dim=1)
 CLOSED_CURVES_SPACE = ClosedDiscreteCurves(Euclidean(dim=2))
-CURVES_SPACE = DiscreteCurves(Euclidean(dim=2), k_sampling_points=n_sampling_points)
+CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2), k_sampling_points=n_sampling_points)
 # SRV_METRIC = CURVES_SPACE.srv_metric
 # L2_METRIC = CURVES_SPACE.l2_curves_metric
 
-ELASTIC_METRIC = {}
+# ELASTIC_METRIC = {}
 
-input_string_AS = st.text_input("Elastic Metric AS (Use comma-seperated values)", "1")
+# input_string_AS = st.text_input("Elastic Metric AS (Use comma-seperated values)", "1")
 
-# Convert string to list of integers
-AS = [float(num) for num in input_string_AS.split(",")]
+# # Convert string to list of integers
+# AS = [float(num) for num in input_string_AS.split(",")]
 
-input_string_BS = st.text_input("Elastic Metric BS (Use comma-seperated values)", "0.5")
-BS = [float(num) for num in input_string_BS.split(",")]
-# AS = [1, 2, 0.75, 0.5, 0.25, 0.01] #, 1.6] #, 1.4, 1.2, 1, 0.5, 0.2, 0.1]
-# BS = [0.5, 1, 0.5, 0.5, 0.5, 0.5] #, 2, 2, 2, 2, 2, 2, 2]
-
-
-for a, b in zip(AS, BS):
-    ELASTIC_METRIC[a, b] = CURVES_SPACE.metric.geodesic(
-        initial_point=a, end_point=b
-    )  # .elastic_metric
-METRICS = {}
-METRICS["Linear"] = L2_METRIC
-METRICS["SRV"] = SRV_METRIC
+# input_string_BS = st.text_input("Elastic Metric BS (Use comma-seperated values)", "0.5")
+# BS = [float(num) for num in input_string_BS.split(",")]
+# # AS = [1, 2, 0.75, 0.5, 0.25, 0.01] #, 1.6] #, 1.4, 1.2, 1, 0.5, 0.2, 0.1]
+# # BS = [0.5, 1, 0.5, 0.5, 0.5, 0.5] #, 2, 2, 2, 2, 2, 2, 2]
 
 
-means = {}
+# for a, b in zip(AS, BS):
+#     ELASTIC_METRIC[a, b] = CURVES_SPACE.metric.geodesic(
+#         initial_point=a, end_point=b
+#     )  # .elastic_metric
+# METRICS = {}
+# METRICS["Linear"] = L2_METRIC
+# METRICS["SRV"] = SRV_METRIC
 
-means["Linear"] = gs.mean(cell_shapes, axis=0)
-means["SRV"] = (
-    FrechetMean(metric=SRV_METRIC, method="default").fit(cell_shapes).estimate_
-)
+
+# means = {}
+
+# means["Linear"] = gs.mean(cell_shapes, axis=0)
+# means["SRV"] = (
+#     FrechetMean(metric=SRV_METRIC, method="default").fit(cell_shapes).estimate_
+# )
 
 
-for a, b in zip(AS, BS):
-    means[a, b] = (
-        FrechetMean(metric=ELASTIC_METRIC[a, b], method="default")
-        .fit(cell_shapes)
-        .estimate_
-    )
+# for a, b in zip(AS, BS):
+#     means[a, b] = (
+#         FrechetMean(metric=ELASTIC_METRIC[a, b], method="default")
+#         .fit(cell_shapes)
+#         .estimate_
+#     )
 
 
 # fig = plt.figure(figsize=(18, 8))
@@ -109,7 +111,7 @@ for a, b in zip(AS, BS):
 
 # fig = plt.figure(figsize=(18, 8))
 
-ncols = len(means) // 2
+# ncols = len(means) // 2
 
 # for i, (mean_name, mean) in enumerate(means.items()):
 #     ax = fig.add_subplot(2, ncols, i+1)
@@ -126,7 +128,18 @@ ncols = len(means) // 2
 #     ax.set_title(mean_name)
 
 # st.pyplot(fig)
+# st.write(cell_shapes)
+cell_shapes = gs.array(cell_shapes)
 
+from geomstats.learning.frechet_mean import FrechetMean
+
+means = FrechetMean(CURVES_SPACE_SRV)
+# st.write(means)
+means.fit(cell_shapes[:500])
+
+mean_estimate = means.estimate_
+
+plt.plot(mean_estimate[:, 0], mean_estimate[:, 1], "black")
 
 ncols = 2  # Define ncols here, the number of columns in your subplot grid
 nrows = (
