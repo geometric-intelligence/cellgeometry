@@ -12,13 +12,13 @@ homepage = "https://github.com/bioshape-lab/cells/tree/main/cells/streamlit"
 python = "^3.10"
 streamlit = "^1.21.0"
 numpy = "1.23.0"
-geomstats = {git = "geomstats@git+https://github.com/geomstats/geomstats"}
 scikit-image = "^0.20.0"
 matplotlib = "^3.7.1"
 numba = "^0.56.4"
 autograd = "^1.5"
 read-roi = "^1.6.0"
 plotly = "^5.14.1"
+
 
 
 [build-system]
