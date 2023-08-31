@@ -3,6 +3,7 @@ from geomstats.geometry.euclidean import Euclidean
 from geomstats.geometry.discrete_curves import DiscreteCurves, ClosedDiscreteCurves
 from geomstats.learning.frechet_mean import FrechetMean
 import plotly.graph_objects as go
+from scipy.stats import gaussian_kde
 from plotly.subplots import make_subplots
 from utils import experimental
 import streamlit as st
@@ -131,7 +132,6 @@ CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2), k_sampling_points=n_sampling
 # st.write(cell_shapes)
 cell_shapes = gs.array(cell_shapes)
 
-from geomstats.learning.frechet_mean import FrechetMean
 
 means = FrechetMean(CURVES_SPACE_SRV)
 # st.write(means)
@@ -139,70 +139,292 @@ means.fit(cell_shapes[:500])
 
 mean_estimate = means.estimate_
 
-plt.plot(mean_estimate[:, 0], mean_estimate[:, 1], "black")
+# plt.plot(mean_estimate[:, 0], mean_estimate[:, 1], "black")
 
-ncols = 2  # Define ncols here, the number of columns in your subplot grid
-nrows = (
-    int(len(means) / ncols) + len(means) % ncols
-)  # calculate number of rows based on length of means
+# Extract x and y coordinates
+x_coords = mean_estimate[:, 0]
+y_coords = mean_estimate[:, 1]
 
-# Create subplots with defined title font and size
-fig = make_subplots(rows=nrows, cols=ncols, subplot_titles=list(map(str, means.keys())))
+line_color = "rgb(255, 0, 191)"
 
-# Define a color palette
-colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]
-
-for i, (mean_name, mean) in enumerate(means.items()):
-    mean = CLOSED_CURVES_SPACE.projection(mean)
-    row = i // ncols + 1
-    col = i % ncols + 1
-    color = colors[i % len(colors)]  # Select color from palette
-    fig.add_trace(
-        go.Scatter(
-            x=mean[:, 0],
-            y=mean[:, 1],
-            mode="lines",
-            name=str(mean_name),
-            line=dict(color=color, width=2),
-        ),
-        row=row,
-        col=col,
-    )
-
-    if mean_name not in ["Linear", "SRV"]:
-        a = mean_name[0]
-        b = mean_name[1]
-        ratio = a / (2 * b)
-        mean_name_str = f"Elastic {mean_name} | a/(2b) = {ratio}"
-        fig.layout.annotations[i]["text"] = str(mean_name_str)  # update subplot title
-
-fig.update_layout(
-    showlegend=False,
-    plot_bgcolor="#fafafa",
-    paper_bgcolor="#fafafa",
-    font=dict(family="Courier New, monospace", size=12, color="black"),
+# Create a Plotly scatter plot
+fig = go.Figure(
+    data=go.Scatter(x=x_coords, y=y_coords, mode="lines", line=dict(color=line_color))
 )
 
-# Update xaxis and yaxis parameters to be invisible
-for i in range(1, nrows * ncols + 1):
-    fig.update_xaxes(
-        showticklabels=False,
-        showgrid=False,
-        zeroline=False,
-        visible=False,
-        row=(i - 1) // ncols + 1,
-        col=(i - 1) % ncols + 1,
-    )
-    fig.update_yaxes(
-        showticklabels=False,
-        showgrid=False,
-        zeroline=False,
-        visible=False,
-        row=(i - 1) // ncols + 1,
-        col=(i - 1) % ncols + 1,
-    )
+# Customize layout
+fig.update_layout(
+    title="Mean Estimate",
+    xaxis_title="X-axis",
+    yaxis_title="Y-axis",
+)
 
-
-# Display the plot
-# fig.show()
+# Display the Plotly figure in Streamlit
 st.plotly_chart(fig)
+
+
+mean_estimate_clean = mean_estimate[~gs.isnan(gs.sum(mean_estimate, axis=1)), :]
+mean_estimate_aligned = 1.55 * (
+    mean_estimate_clean - gs.mean(mean_estimate_clean, axis=0)
+)
+
+
+# Create a Plotly figure
+fig = go.Figure()
+
+# Plot cell shapes
+for cell in cell_shapes:
+    fig.add_trace(
+        go.Scatter(
+            x=cell[:, 0],
+            y=cell[:, 1],
+            mode="lines",
+            line=dict(color="lightgrey", width=1),
+        )
+    )
+
+# Plot mean estimate
+fig.add_trace(
+    go.Scatter(
+        x=mean_estimate_aligned[:, 0],
+        y=mean_estimate_aligned[:, 1],
+        mode="lines",
+        line=dict(color="black", width=2),
+        name="Mean cell",
+    )
+)
+
+# Customize layout
+fig.update_layout(
+    title="Cell Shapes and Mean Estimate",
+    xaxis_title="X-axis",
+    yaxis_title="Y-axis",
+    legend=dict(font=dict(size=12)),
+)
+
+# Display the Plotly figure in Streamlit
+st.plotly_chart(fig)
+
+
+mean_estimate_aligned_bis = gs.vstack(
+    [mean_estimate_aligned[4:], mean_estimate_aligned[-1]]
+)
+
+
+cells_to_plot = cell_shapes[gs.random.randint(len(cell_shapes), size=500)]
+points_to_plot = cells_to_plot.reshape(-1, 2)
+
+z = gaussian_kde(points_to_plot.T)(points_to_plot.T)
+z_norm = z / z.max()
+
+# Create a Plotly figure
+fig = go.Figure()
+
+# Scatter plot for points
+fig.add_trace(
+    go.Scatter(
+        x=points_to_plot[:, 0],
+        y=points_to_plot[:, 1],
+        mode="markers",
+        marker=dict(color=z_norm, size=10, opacity=0.2),
+    )
+)
+
+# Plot mean estimate
+fig.add_trace(
+    go.Scatter(
+        x=mean_estimate_aligned_bis[:, 0],
+        y=mean_estimate_aligned_bis[:, 1],
+        mode="lines",
+        line=dict(color="black", width=2),
+        name="Mean cell",
+    )
+)
+
+# Customize layout
+fig.update_layout(
+    title="Global mean shape superimposed on the dataset of cells",
+    xaxis_title="X-axis",
+    yaxis_title="Y-axis",
+    legend=dict(font=dict(size=12)),
+    title_font_size=14,
+)
+
+# Display the Plotly figure in Streamlit
+st.plotly_chart(fig)
+
+import numpy as np
+
+
+# Create a density heatmap instead of scatter points
+hist_data = np.histogram2d(points_to_plot[:, 0], points_to_plot[:, 1], bins=(100, 100))
+heatmap = go.Heatmap(
+    z=hist_data[0], x=hist_data[1], y=hist_data[2], colorscale="Viridis", opacity=0.6
+)
+
+# Plot mean estimate with gradient color
+mean_shape_line = go.Scatter(
+    x=mean_estimate_aligned_bis[:, 0],
+    y=mean_estimate_aligned_bis[:, 1],
+    mode="lines",
+    line=dict(width=2, color="mediumpurple"),
+    name="Mean cell",
+    hovertext=[
+        f"X: {x}, Y: {y}"
+        for x, y in zip(
+            mean_estimate_aligned_bis[:, 0], mean_estimate_aligned_bis[:, 1]
+        )
+    ],
+)
+
+# Customize layout with a unique theme
+layout = go.Layout(
+    title="Global mean shape superimposed on the density heatmap of cells",
+    xaxis_title="X-axis",
+    yaxis_title="Y-axis",
+    legend=dict(font=dict(size=12)),
+    title_font_size=14,
+    # template="plotly_dark",  # Use a dark theme for a unique look
+)
+
+fig = go.Figure(data=[heatmap, mean_shape_line], layout=layout)
+
+# Display the Plotly figure in Streamlit
+st.plotly_chart(fig)
+
+
+import plotly.graph_objects as go
+import numpy as np
+
+# Calculate distances of each point from the mean shape's centroid
+centroid = [
+    np.mean(mean_estimate_aligned_bis[:, 0]),
+    np.mean(mean_estimate_aligned_bis[:, 1]),
+]
+distances = np.linalg.norm(points_to_plot - centroid, axis=1)
+
+# Convert distances to angles for radial plot
+angles = np.linspace(0, 2 * np.pi, len(points_to_plot))
+
+# Set color based on distance
+color_scale = np.interp(distances, (distances.min(), distances.max()), (0, 1))
+
+# Custom color gradient
+colors = [
+    (0, (0, 0, 255)),  # Blue
+    (0.5, (128, 0, 128)),  # Purple
+    (1, (255, 0, 0)),  # Red
+]
+
+
+def get_color(value, colors):
+    for i, color in enumerate(colors[:-1]):
+        if value <= color[0]:
+            return color[1]
+        elif value <= colors[i + 1][0]:
+            fraction = (value - color[0]) / (colors[i + 1][0] - color[0])
+            return f"rgb({int(color[1][0] + fraction * (colors[i+1][1][0] - color[1][0]))}, {int(color[1][1] + fraction * (colors[i+1][1][1] - color[1][1]))}, {int(color[1][2] + fraction * (colors[i+1][1][2] - color[1][2]))})"
+    return colors[-1][1]
+
+
+# Create radial lines for each cell shape
+lines = []
+for angle, distance, color in zip(angles, distances, color_scale):
+    line_color = get_color(color, colors)
+    line = go.Scatterpolar(
+        r=[0, distance],
+        theta=[np.degrees(angle), np.degrees(angle)],
+        mode="lines",
+        line=dict(color="mediumpurple", width=2),
+        hoverinfo="none",  # To keep the visualization clean; can be set to 'all' if needed
+    )
+    lines.append(line)
+
+# Mean shape as a rotating centerpiece
+mean_shape_radial = go.Scatterpolar(
+    r=distances.mean() * np.ones_like(angles),
+    theta=np.degrees(angles),
+    mode="lines",
+    line=dict(color="white", width=3),
+    name="Mean cell",
+)
+
+layout = go.Layout(
+    title="Radial Representation of Cell Shapes with Mean Shape Centerpiece",
+    polar=dict(radialaxis=dict(visible=False), angularaxis=dict(visible=False)),
+    template="plotly_dark",
+)
+
+fig = go.Figure(data=lines + [mean_shape_radial], layout=layout)
+
+# Display the Plotly figure in Streamlit
+st.plotly_chart(fig)
+
+
+#############################################################
+# ncols = 2  # Define ncols here, the number of columns in your subplot grid
+# nrows = (
+#     int(len(means) / ncols) + len(means) % ncols
+# )  # calculate number of rows based on length of means
+
+# # Create subplots with defined title font and size
+# fig = make_subplots(rows=nrows, cols=ncols, subplot_titles=list(map(str, means.keys())))
+
+# # Define a color palette
+# colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]
+
+# for i, (mean_name, mean) in enumerate(means.items()):
+#     mean = CLOSED_CURVES_SPACE.projection(mean)
+#     row = i // ncols + 1
+#     col = i % ncols + 1
+#     color = colors[i % len(colors)]  # Select color from palette
+#     fig.add_trace(
+#         go.Scatter(
+#             x=mean[:, 0],
+#             y=mean[:, 1],
+#             mode="lines",
+#             name=str(mean_name),
+#             line=dict(color=color, width=2),
+#         ),
+#         row=row,
+#         col=col,
+#     )
+
+#     if mean_name not in ["Linear", "SRV"]:
+#         a = mean_name[0]
+#         b = mean_name[1]
+#         ratio = a / (2 * b)
+#         mean_name_str = f"Elastic {mean_name} | a/(2b) = {ratio}"
+#         fig.layout.annotations[i]["text"] = str(mean_name_str)  # update subplot title
+
+# fig.update_layout(
+#     showlegend=False,
+#     plot_bgcolor="#fafafa",
+#     paper_bgcolor="#fafafa",
+#     font=dict(family="Courier New, monospace", size=12, color="black"),
+# )
+
+# # Update xaxis and yaxis parameters to be invisible
+# for i in range(1, nrows * ncols + 1):
+#     fig.update_xaxes(
+#         showticklabels=False,
+#         showgrid=False,
+#         zeroline=False,
+#         visible=False,
+#         row=(i - 1) // ncols + 1,
+#         col=(i - 1) % ncols + 1,
+#     )
+#     fig.update_yaxes(
+#         showticklabels=False,
+#         showgrid=False,
+#         zeroline=False,
+#         visible=False,
+#         row=(i - 1) // ncols + 1,
+#         col=(i - 1) % ncols + 1,
+#     )
+
+
+# # Display the plot
+# # fig.show()
+# st.plotly_chart(fig)
+#############################################################

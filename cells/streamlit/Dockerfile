@@ -2,7 +2,7 @@
 FROM python:3.10-slim-buster
 
 # Run APT installs
-RUN apt update && apt install -y git
+RUN apt update && apt install -y git build-essential curl
 
 # Set the working directory to /app
 WORKDIR /app

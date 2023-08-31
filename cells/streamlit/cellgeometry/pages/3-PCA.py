@@ -1,8 +1,11 @@
 import geomstats.backend as gs
 from geomstats.geometry.euclidean import Euclidean
-from geomstats.geometry.discrete_curves import R2, DiscreteCurves, ClosedDiscreteCurves
+from geomstats.geometry.discrete_curves import DiscreteCurves, ClosedDiscreteCurves
 from geomstats.learning.pca import TangentPCA
+from geomstats.learning.frechet_mean import FrechetMean
 from sklearn.decomposition import PCA
+import pacmap
+import plotly.express as px
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -26,20 +29,35 @@ if cells.size == 0:
 cells_flat = gs.reshape(cells, (len(cells), -1))
 
 R1 = Euclidean(dim=1)
-CLOSED_CURVES_SPACE = ClosedDiscreteCurves(R2)
-CURVES_SPACE = DiscreteCurves(R2)
-SRV_METRIC = CURVES_SPACE.srv_metric
-L2_METRIC = CURVES_SPACE.l2_curves_metric
+CLOSED_CURVES_SPACE = ClosedDiscreteCurves(Euclidean(dim=2))
+CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2))
+mean = FrechetMean(CURVES_SPACE_SRV)
 
 n_components = st.slider("Select the Number of Sampling Points", 0, len(cells_flat), 10)
 
-pcas = {}
-pcas["Linear"] = PCA(n_components=n_components).fit(cells_flat)
-pcas["Linear_components"] = PCA(n_components=n_components).fit_transform(cells_flat)
-pcas["SRV"] = TangentPCA(n_components=n_components, metric=SRV_METRIC).fit(cell_shapes)
-pcas["SRV_components"] = TangentPCA(
-    n_components=n_components, metric=SRV_METRIC
-).fit_transform(cell_shapes)
+st.write(cell_shapes.shape)
+# Perform PacMap dimensionality reduction
+model = pacmap.PaCMAP()
+embedding = model.fit_transform(cells_flat)
+
+# Visualize the embedding using Plotly Express
+fig = px.scatter(
+    x=embedding[:, 0],
+    y=embedding[:, 1],
+    title="PacMap Embedding",
+    labels={"x": "Dimension 1", "y": "Dimension 2"},
+)
+
+# Display the Plotly figure in Streamlit
+st.plotly_chart(fig)
+
+# pcas = {}
+# pcas["Linear"] = PCA(n_components=n_components).fit(cells_flat)
+# pcas["Linear_components"] = PCA(n_components=n_components).fit_transform(cells_flat)
+# pcas["SRV"] = TangentPCA(n_components=n_components, space=mean).fit(cell_shapes)
+# pcas["SRV_components"] = TangentPCA(
+#     n_components=n_components, space=mean
+# ).fit_transform(cell_shapes)
 
 # fig, axs = plt.subplots(1, 2, figsize=(12, 4), sharey=True)
 
