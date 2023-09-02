@@ -1,6 +1,6 @@
 """Unit tests for the basic shape features."""
 
-import cells.streamlit.cellgeometry.utils.basic as basic
+import cellgeometry.utils.basic as basic
 import geomstats.backend as gs
 
 

@@ -8,20 +8,27 @@ from streamlit.web.server.websocket_headers import _get_websocket_headers
 headers = _get_websocket_headers()
 access_token = headers.get("X-Forwarded-User")
 st.session_state["username"] = access_token
-# st.success(f"Successfully logged in as __{access_token}__", icon="✅")
 
 st.set_page_config(
     page_title="Welcome to Cell Shape Analysis",
     page_icon=":rocket:",
 )
 
+
+st.sidebar.title("Cell Shape Analysis")
 st.sidebar.success("Select a demo above.")
+
+st.success(f"Successfully logged in as __{access_token}__", icon="✅")
 
 st.markdown(
     """
     ![Asset 5](https://github.com/bioshape-lab/cells/assets/22850980/344f448f-84a9-4f06-8527-8ddec210fb31)
     """
 )
+
+# https://geomstats.github.io/notebooks/10_practical_methods__shape_analysis.html
+# https://arxiv.org/pdf/1803.10894.pdf
+# https://arxiv.org/pdf/2209.09862.pdf
 
 # Define the GitHub link
 github_link = "https://github.com/bioshape-lab/cells/tree/main/cells/streamlit"

@@ -18,6 +18,9 @@ numba = "^0.56.4"
 autograd = "^1.5"
 read-roi = "^1.6.0"
 plotly = "^5.14.1"
+torch = "^2.0.1"
+simpleitk = "^2.2.1"
+torchvision = "^0.15.2"
 
 
 

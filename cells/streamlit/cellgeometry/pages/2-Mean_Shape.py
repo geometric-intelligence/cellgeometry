@@ -135,7 +135,7 @@ cell_shapes = gs.array(cell_shapes)
 
 means = FrechetMean(CURVES_SPACE_SRV)
 # st.write(means)
-means.fit(cell_shapes[:500])
+means.fit(cell_shapes)
 
 mean_estimate = means.estimate_
 
@@ -253,112 +253,36 @@ fig.update_layout(
 # Display the Plotly figure in Streamlit
 st.plotly_chart(fig)
 
-import numpy as np
+# import numpy as np
 
 
-# Create a density heatmap instead of scatter points
-hist_data = np.histogram2d(points_to_plot[:, 0], points_to_plot[:, 1], bins=(100, 100))
-heatmap = go.Heatmap(
-    z=hist_data[0], x=hist_data[1], y=hist_data[2], colorscale="Viridis", opacity=0.6
-)
+# # Create a density heatmap instead of scatter points
+# hist_data = np.histogram2d(points_to_plot[:, 0], points_to_plot[:, 1], bins=(100, 100))
+# heatmap = go.Heatmap(z=hist_data[0], x=hist_data[1], y=hist_data[2], colorscale='Viridis', opacity=0.6)
 
-# Plot mean estimate with gradient color
-mean_shape_line = go.Scatter(
-    x=mean_estimate_aligned_bis[:, 0],
-    y=mean_estimate_aligned_bis[:, 1],
-    mode="lines",
-    line=dict(width=2, color="mediumpurple"),
-    name="Mean cell",
-    hovertext=[
-        f"X: {x}, Y: {y}"
-        for x, y in zip(
-            mean_estimate_aligned_bis[:, 0], mean_estimate_aligned_bis[:, 1]
-        )
-    ],
-)
+# # Plot mean estimate with gradient color
+# mean_shape_line = go.Scatter(
+#     x=mean_estimate_aligned_bis[:, 0], y=mean_estimate_aligned_bis[:, 1],
+#     mode='lines',
+#     line=dict(width=2, color='mediumpurple'),
+#     name='Mean cell',
+#     hovertext=[f"X: {x}, Y: {y}" for x, y in zip(mean_estimate_aligned_bis[:, 0], mean_estimate_aligned_bis[:, 1])]
+# )
 
-# Customize layout with a unique theme
-layout = go.Layout(
-    title="Global mean shape superimposed on the density heatmap of cells",
-    xaxis_title="X-axis",
-    yaxis_title="Y-axis",
-    legend=dict(font=dict(size=12)),
-    title_font_size=14,
-    # template="plotly_dark",  # Use a dark theme for a unique look
-)
+# # Customize layout with a unique theme
+# layout = go.Layout(
+#     title="Global mean shape superimposed on the density heatmap of cells",
+#     xaxis_title="X-axis",
+#     yaxis_title="Y-axis",
+#     legend=dict(font=dict(size=12)),
+#     title_font_size=14,
+#     # template="plotly_dark",  # Use a dark theme for a unique look
+# )
 
-fig = go.Figure(data=[heatmap, mean_shape_line], layout=layout)
+# fig = go.Figure(data=[heatmap, mean_shape_line], layout=layout)
 
-# Display the Plotly figure in Streamlit
-st.plotly_chart(fig)
-
-
-import plotly.graph_objects as go
-import numpy as np
-
-# Calculate distances of each point from the mean shape's centroid
-centroid = [
-    np.mean(mean_estimate_aligned_bis[:, 0]),
-    np.mean(mean_estimate_aligned_bis[:, 1]),
-]
-distances = np.linalg.norm(points_to_plot - centroid, axis=1)
-
-# Convert distances to angles for radial plot
-angles = np.linspace(0, 2 * np.pi, len(points_to_plot))
-
-# Set color based on distance
-color_scale = np.interp(distances, (distances.min(), distances.max()), (0, 1))
-
-# Custom color gradient
-colors = [
-    (0, (0, 0, 255)),  # Blue
-    (0.5, (128, 0, 128)),  # Purple
-    (1, (255, 0, 0)),  # Red
-]
-
-
-def get_color(value, colors):
-    for i, color in enumerate(colors[:-1]):
-        if value <= color[0]:
-            return color[1]
-        elif value <= colors[i + 1][0]:
-            fraction = (value - color[0]) / (colors[i + 1][0] - color[0])
-            return f"rgb({int(color[1][0] + fraction * (colors[i+1][1][0] - color[1][0]))}, {int(color[1][1] + fraction * (colors[i+1][1][1] - color[1][1]))}, {int(color[1][2] + fraction * (colors[i+1][1][2] - color[1][2]))})"
-    return colors[-1][1]
-
-
-# Create radial lines for each cell shape
-lines = []
-for angle, distance, color in zip(angles, distances, color_scale):
-    line_color = get_color(color, colors)
-    line = go.Scatterpolar(
-        r=[0, distance],
-        theta=[np.degrees(angle), np.degrees(angle)],
-        mode="lines",
-        line=dict(color="mediumpurple", width=2),
-        hoverinfo="none",  # To keep the visualization clean; can be set to 'all' if needed
-    )
-    lines.append(line)
-
-# Mean shape as a rotating centerpiece
-mean_shape_radial = go.Scatterpolar(
-    r=distances.mean() * np.ones_like(angles),
-    theta=np.degrees(angles),
-    mode="lines",
-    line=dict(color="white", width=3),
-    name="Mean cell",
-)
-
-layout = go.Layout(
-    title="Radial Representation of Cell Shapes with Mean Shape Centerpiece",
-    polar=dict(radialaxis=dict(visible=False), angularaxis=dict(visible=False)),
-    template="plotly_dark",
-)
-
-fig = go.Figure(data=lines + [mean_shape_radial], layout=layout)
-
-# Display the Plotly figure in Streamlit
-st.plotly_chart(fig)
+# # Display the Plotly figure in Streamlit
+# st.plotly_chart(fig)
 
 
 #############################################################

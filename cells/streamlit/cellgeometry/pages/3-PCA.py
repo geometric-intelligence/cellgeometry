@@ -17,6 +17,7 @@ st.sidebar.header("STEP 3: PCA")
 
 st.write("# Principal Component Analysis (PCA) 👋")
 
+
 cells = st.session_state["cells"]
 cell_shapes = st.session_state["cell_shapes"]
 if cells.size == 0:
@@ -27,11 +28,12 @@ if cells.size == 0:
 
 
 cells_flat = gs.reshape(cells, (len(cells), -1))
+# st.write("Cells flat", len(cells))
 
 R1 = Euclidean(dim=1)
 CLOSED_CURVES_SPACE = ClosedDiscreteCurves(Euclidean(dim=2))
 CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2))
-mean = FrechetMean(CURVES_SPACE_SRV)
+mean = FrechetMean(CURVES_SPACE_SRV).fit(cell_shapes)
 
 n_components = st.slider("Select the Number of Sampling Points", 0, len(cells_flat), 10)
 
@@ -48,9 +50,75 @@ fig = px.scatter(
     labels={"x": "Dimension 1", "y": "Dimension 2"},
 )
 
+# st.write(cell_shapes.shape[0] * cell_shapes.shape[1])
+
 # Display the Plotly figure in Streamlit
 st.plotly_chart(fig)
 
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown("##### Number of Components")
+    n_components = st.number_input(
+        "Input dimensions of the embedded space. Default = 2",
+        min_value=2,
+        max_value=None,
+    )
+    st.write("Selected number of components:  ", n_components)
+
+with col2:
+    st.markdown("##### Number of Neighbors")
+    neighbors_num = st.number_input(
+        "Input number of neighbors considered for nearest neighbor pairs for local structure preservation. Default = 10 ",
+        min_value=1,
+        max_value=None,
+    )
+    st.write("Selected number of neighbors:  ", neighbors_num)
+
+with col3:
+    st.markdown("##### Learning Rate")
+    lr = st.number_input("Input learning rate. Default = 1.0")
+    st.write("The learning rate is ", lr)
+
+dist_options = st.selectbox(
+    "Select distance metric. Default = euclidean",
+    ("euclidean", "manhattan", "angular", "hamming"),
+)
+
+st.write("You selected:", dist_options)
+
+
+# pcas = {}
+
+# st.write(mean.estimate_)
+# logs = CURVES_SPACE_SRV.metric.log(cells_flat, base_point=mean.estimate_)
+# logs = gs.reshape(logs, (len(cells), -1))
+# PCA(n_components).fit(logs)
+
+
+CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2))
+mean = FrechetMean(CURVES_SPACE_SRV).fit(cell_shapes)
+logs = []
+for one_cell in cell_shapes:
+    one_log = CURVES_SPACE_SRV.metric.log(one_cell, base_point=mean.estimate_)
+    logs.append(one_log)
+logs = gs.array(logs)  # same shape as cell_shapes here
+logs = gs.reshape(logs, (len(cells), -1))
+PCA(n_components).fit(logs)
+
+# for one_shape in cells_flat:
+#     one_log = CURVES_SPACE_SRV.metric.log(one_shape, base_point=mean.estimate_)
+
+# for one_shape in cell_shapes:
+#     one_log = CURVES_SPACE_SRV.metric.log(one_shape, base_point=mean.estimate_)
+# CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2))
+
+# pcas["SRV"] = TangentPCA(n_components=n_components, space=CURVES_SPACE_SRV).fit(cell_shapes)
+
+# CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2))
+# mean = FrechetMean(CURVES_SPACE_SRV).fit(cell_shapes)
+# pcas["SRV"] = TangentPCA(n_components=n_components, space=CURVES_SPACE_SRV).fit(cell_shapes, base_point=mean.estimate_)
 # pcas = {}
 # pcas["Linear"] = PCA(n_components=n_components).fit(cells_flat)
 # pcas["Linear_components"] = PCA(n_components=n_components).fit_transform(cells_flat)

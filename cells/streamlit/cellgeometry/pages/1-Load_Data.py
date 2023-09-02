@@ -8,9 +8,12 @@ from utils.data_utils import (
     check_file_extensions,
     parse_coordinates,
     get_file_or_folder_type,
+    get_csv_txt_files,
 )
 import plotly.graph_objects as go
 import streamlit as st
+import pandas as pd
+import glob
 
 
 st.sidebar.header("STEP 1: Load Data")
@@ -27,10 +30,10 @@ if username is None:
 #########################################
 
 current_time = time.localtime()
-
 year = time.strftime("%Y", current_time)
 day_of_year = time.strftime("%j", current_time)
 time_string = time.strftime("%H%M%S", current_time)
+upload_folder = f"/app/data/{username}"
 
 if "current_time_string" not in st.session_state:
     current_time_string = f"{year}{day_of_year}-{time_string}"
@@ -40,8 +43,12 @@ if "current_time_string" not in st.session_state:
 if "cells_list" not in st.session_state:
     st.session_state["cells_list"] = True
 
+if "config_option" not in st.session_state:
+    st.session_state["config_option"] = "Upload a File"
+
 st.write("# Load Your Cell Data 👋")
 
+st.divider()
 st.markdown(
     """
 ## Getting Started
@@ -65,6 +72,9 @@ Your chosen data structure __must__ contain `x` and `y` for the program to corre
 and load your data.
 """
 )
+st.divider()
+
+st.header("Step 1. Select Input Data")
 
 
 def build_and_load_data(upload_folder):
@@ -101,19 +111,6 @@ def build_and_load_data(upload_folder):
         st.success(f"Successfully Loaded {len(cells_list)} cells.", icon="✅")
 
 
-# def handle_uploaded_files(uploaded_files, destination_folder):
-#     progress_bar = st.progress(0)
-#     total_files = len(uploaded_files)
-#     for idx, uploaded_file in enumerate(uploaded_files):
-#         file_path = os.path.join(destination_folder, uploaded_file.name)
-#         with open(file_path, "wb") as f:
-#             f.write(uploaded_file.getbuffer())
-#         progress = int(((idx + 1) / total_files) * 100)
-#         progress_bar.progress(progress)
-
-
-upload_folder = f"/app/data/{username}"
-
 # Check if the upload folder exists, and create it if it doesn't
 if not os.path.exists(upload_folder):
     os.makedirs(upload_folder)
@@ -124,6 +121,11 @@ if not os.path.exists(upload_folder):
 config_option = st.radio(
     "How would you like to provide the data?",
     ["Upload a File", "Choose an Uploaded File"],
+    captions=[
+        "Data must be in `.zip` for ImageJ ROI, `.txt` accepted",
+        "Select previously uploaded data.",
+    ],
+    key="config_option",
 )
 
 
@@ -141,9 +143,9 @@ def handle_uploaded_file(uploaded_file, destination_folder):
         f.write(uploaded_file.getbuffer())
 
 
-if config_option == "Upload a File":
+if st.session_state["config_option"] == "Upload a File":
     uploaded_files = st.file_uploader(
-        "Upload one or multiple files (zip, csv, txt)",
+        "Upload ___Cell Data___ in one or multiple files (zip, csv, txt)",
         type=["zip", "csv", "txt"],
         accept_multiple_files=True,
     )
@@ -166,7 +168,7 @@ if config_option == "Upload a File":
             build_and_load_data(st.session_state["selected_dataset"])
 
 
-elif config_option == "Choose an Uploaded File":
+elif st.session_state["config_option"] == "Choose an Uploaded File":
 
     if upload_folder and os.path.exists(upload_folder):
 
@@ -213,6 +215,107 @@ elif config_option == "Choose an Uploaded File":
         st.warning("No files have been uploaded yet.")
 
 
+st.header("Step 2. Select Labels (Optional)")
+
+st.markdown(
+    """
+            Your labels should be in a `.csv` or `.txt` file. Within this file, each row corresponds to the cell number and that row should contain the label for that cell. For example, if you have 10 cells, your file should have 10 rows. The first row should be the label for cell 0, the second row should be the label for cell 1, and so on. The label can be any string, but it should be unique for each cell.
+
+            For example, if you are uploading the treatments for each cell you can use `control`, `cytd`, `jasp`, etc.
+            """
+)
+
+hasTreatments = st.checkbox("Treatments")
+
+treatment_col1, treatment_col2 = st.columns([0.8, 0.2], gap="medium")
+with treatment_col1:
+    if hasTreatments:
+        uploaded_labels = st.file_uploader(
+            "Upload ___Treatments___ in one or multiple files (`csv`, `txt`)",
+            type=["csv", "txt"],
+            accept_multiple_files=True,
+        )
+
+        if uploaded_labels:
+            with st.spinner("Processing files..."):
+                for uploaded_label in uploaded_labels:
+
+                    handle_uploaded_file(uploaded_label, upload_folder)
+
+                st.session_state["treatment"] = pd.read_csv(
+                    uploaded_label, header=None
+                ).values
+
+        if st.session_state["config_option"] == "Choose an Uploaded File":
+
+            # Display the files in a dropdown
+            selected_treatment_file = st.selectbox(
+                "Choose a file:",
+                get_csv_txt_files(upload_folder),
+                key="selected_treatment_file",
+            )
+
+            selected_treatment_path = os.path.join(
+                upload_folder, selected_treatment_file
+            )
+            st.session_state["treatment"] = pd.read_csv(
+                selected_treatment_path, header=None
+            ).values
+
+
+with treatment_col2:
+    if hasTreatments:
+        st.write("__Preview__")
+        st.dataframe(st.session_state["treatment"], width=100, height=210)
+
+st.divider()
+
+hasCellLines = st.checkbox("Cell Lines")
+
+cell_line_col1, cell_line_col2 = st.columns([0.8, 0.2])
+with cell_line_col1:
+    if hasCellLines:
+        uploaded_labels = st.file_uploader(
+            "Upload ___Cell Lines___ in one or multiple files (`csv`, `txt`)",
+            type=["csv", "txt"],
+            accept_multiple_files=True,
+        )
+
+        if uploaded_labels:
+            with st.spinner("Processing files..."):
+                for uploaded_label in uploaded_labels:
+
+                    handle_uploaded_file(uploaded_label, upload_folder)
+
+                st.session_state["cell_lines"] = pd.read_csv(
+                    uploaded_label, header=None
+                ).values
+
+        if st.session_state["config_option"] == "Choose an Uploaded File":
+
+            # Display the files in a dropdown
+            selected_cell_line_file = st.selectbox(
+                "Choose a file:",
+                get_csv_txt_files(upload_folder),
+                key="selected_cell_line_file",
+            )
+
+            selected_cell_line_path = os.path.join(
+                upload_folder, selected_cell_line_file
+            )
+
+            st.session_state["cell_lines"] = pd.read_csv(
+                selected_cell_line_path, header=None
+            ).values
+
+with cell_line_col2:
+    if hasCellLines:
+        st.write("__Preview__")
+        st.dataframe(st.session_state["cell_lines"], width=100, height=210)
+
+
+# st.write(st.session_state["labels"])
+
 if st.session_state.cells_list == True:
     st.warning("Please upload a zipped file of ROIs or a CSV/TXT file.")
     st.stop()
@@ -223,11 +326,6 @@ st.markdown("## Preview of Cell Data")
 st.warning(
     "⚠️ This is a preview your uploaded raw data. We have not preprocessed your data yet to close the curves and remove duplicates. Please continue to the next page to preprocess your data."
 )
-
-(
-    col1,
-    col2,
-) = st.columns(2)
 
 
 # Sanity check visualization
@@ -266,6 +364,7 @@ fig = go.Figure(data=trace, layout=layout)
 
 # Display the Plotly figure using Streamlit
 st.plotly_chart(fig)
+
 
 st.dataframe(st.session_state.cells_list[cell_num])
 

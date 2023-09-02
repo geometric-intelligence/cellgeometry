@@ -3,6 +3,7 @@ from read_roi import read_roi_zip
 import numpy as np
 import pandas as pd
 import streamlit as st
+import glob
 
 
 def build_rois(path) -> dict:
@@ -260,3 +261,18 @@ def get_file_or_folder_type(path):
         return ":file_folder: Folder"
     else:
         return "Neither"
+
+
+def get_csv_txt_files(upload_folder):
+    # Get a list of all CSV and TXT files in the directory
+    csv_files = glob.glob(os.path.join(upload_folder, "*.csv"))
+    txt_files = glob.glob(os.path.join(upload_folder, "*.txt"))
+
+    # Extract file names from paths
+    csv_file_names = [os.path.basename(file) for file in csv_files]
+    txt_file_names = [os.path.basename(file) for file in txt_files]
+
+    # Combine the lists of file names
+    filtered_file_names = csv_file_names + txt_file_names
+
+    return filtered_file_names
