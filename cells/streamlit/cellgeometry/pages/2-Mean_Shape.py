@@ -7,6 +7,7 @@ from scipy.stats import gaussian_kde
 from plotly.subplots import make_subplots
 from utils import experimental
 import streamlit as st
+import pandas as pd
 
 
 st.sidebar.header("STEP 2: Compute Mean Shape")
@@ -40,248 +41,316 @@ cells_list = st.session_state["cells_list"]
 n_sampling_points = st.slider("Select the Number of Sampling Points", 0, 250, 150)
 st.session_state["n_sampling_points"] = n_sampling_points
 
-if "cell_shapes" not in st.session_state:
-    cells, cell_shapes = experimental.nolabel_preprocess(
-        cells_list, len(cells_list), n_sampling_points
-    )
-    st.write(cell_shapes.shape)
-    st.session_state["cells"] = cells
-    st.session_state["cell_shapes"] = cell_shapes
-
-if st.session_state["cell_lines"] is not None:
-    cell_lines = st.session_state["cell_lines"]
-    exp_geo_traj = st.sidebar.checkbox("Explore Geodesic Trajectory")
-
-if st.session_state["treatment"] is not None:
-    treatment = st.session_state["treatment"]
-
-# st.write(cell_shapes[0], cell_lines[0], treatment[0])
 
 CLOSED_CURVES_SPACE = ClosedDiscreteCurves(Euclidean(dim=2))
 CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2), k_sampling_points=n_sampling_points)
 
 
+cells, cell_shapes = experimental.nolabel_preprocess(
+    cells_list, len(cells_list), n_sampling_points
+)
+
+
+st.write(cell_shapes.shape)
+st.session_state["cells"] = cells
+st.session_state["cell_shapes"] = cell_shapes
+
+if st.session_state["cell_lines"] is not None:
+    cell_lines = st.session_state["cell_lines"]
+    if st.session_state["treatment"] is not None:
+        treatment = st.session_state["treatment"]
+        exp_geo_traj = st.sidebar.toggle("Explore Geodesic Trajectory")
+
+
+toggle_states = {}
+
 if exp_geo_traj:
-    st.header("Explore Geodesic Trajectory Joining Two Cell Shapes")
+    col1, col2 = st.columns(2, gap="medium")
+    with col1:
+        selected_treatment = st.radio(
+            "Select Treatment 👇", gs.unique(treatment), key="geodesic_treatment"
+        )
+    with col2:
+        selected_cell_line1, selected_cell_line2 = st.multiselect(
+            "Select Cell Line 👇",
+            gs.unique(cell_lines),
+            default=gs.unique(cell_lines)[:2],
+            key="geodesic_cell_line",
+        )
+
+    def find_indices_with_selected_string(string_list, selected_string):
+        indices = [
+            index
+            for index, string in enumerate(string_list)
+            if string == selected_string
+        ]
+        return indices
+
+    cell_indices_treatment = find_indices_with_selected_string(
+        treatment, selected_treatment
+    )
+    cell_indices_cell_line1 = find_indices_with_selected_string(
+        cell_lines, selected_cell_line1
+    )
+    cell_indices_cell_line2 = find_indices_with_selected_string(
+        cell_lines, selected_cell_line2
+    )
+
+    cell_indices1 = list(set(cell_indices_treatment) & set(cell_indices_cell_line1))
+    cell_indices2 = list(set(cell_indices_treatment) & set(cell_indices_cell_line2))
+
+    geodesic_cell_index = st.select_slider(
+        "Select a Cell Index", cell_indices1, key="geodesic_cell_index"
+    )
+    geodesic_cell_index2 = st.select_slider(
+        "Select a Cell Index", cell_indices2, key="geodesic_cell_index2"
+    )
+
+    # st.write(pd.DataFrame(cell_indices))
+    # st.write(pd.DataFrame(treatment))
+    # st.write(pd.DataFrame(cell_lines))
 
     # i_start_rand = gs.random.randint(len(ds_proj["control"]["dunn"]))
     # i_end_rand = gs.random.randint(len(ds_proj["control"]["dlm8"]))
 
-    # cell_start = ds_align["control"]["dunn"][i_start_rand]
-    # cell_end = ds_align["control"]["dlm8"][i_end_rand]
+    cell_start = cell_shapes[geodesic_cell_index]
+    cell_end = cell_shapes[geodesic_cell_index2]
 
     # print(i_start_rand, i_end_rand)
 
-    # geodesic_func = CURVES_SPACE_SRV.metric.geodesic(initial_point=cell_start, end_point=cell_end)
+    geodesic_func = CURVES_SPACE_SRV.metric.geodesic(
+        initial_point=cell_start, end_point=cell_end
+    )
 
-    # n_times = 30
-    # times = gs.linspace(0.0, 1.0, n_times)
-    # geod_points = geodesic_func(times)
+    n_times = 30
+    times = gs.linspace(0.0, 1.0, n_times)
+    geod_points = geodesic_func(times)
 
+    # Create a subplots layout
+    fig = make_subplots(
+        rows=2,
+        cols=n_times // 2,
+    )
 
-# SRV_METRIC = CURVES_SPACE.srv_metric
-# L2_METRIC = CURVES_SPACE.l2_curves_metric
+    # Add traces to the subplots
+    for i, curve in enumerate(geod_points):
+        row = i // (n_times // 2) + 1
+        col = i % (n_times // 2) + 1
+        trace = go.Scatter(x=curve[:, 0], y=curve[:, 1])
+        fig.add_trace(trace, row=row, col=col)
 
-# ELASTIC_METRIC = {}
+    # Remove grid lines and axis lines
+    for i in range(1, 3):  # for 2 rows
+        for j in range(1, n_times // 2 + 1):  # for n_times//2 columns
+            fig.update_xaxes(
+                showgrid=False,
+                zeroline=False,
+                showticklabels=False,
+                visible=False,
+                row=i,
+                col=j,
+            )
+            fig.update_yaxes(
+                showgrid=False,
+                zeroline=False,
+                showticklabels=False,
+                visible=False,
+                row=i,
+                col=j,
+            )
 
-# input_string_AS = st.text_input("Elastic Metric AS (Use comma-seperated values)", "1")
+    # Update layout settings
+    fig.update_layout(
+        title="Geodesic between two cells",
+        showlegend=False,
+        xaxis_visible=False,
+        yaxis_visible=False,
+        paper_bgcolor="rgba(0,0,0,0)",  # Transparent background
+        plot_bgcolor="rgba(0,0,0,0)",
+    )
 
-# # Convert string to list of integers
-# AS = [float(num) for num in input_string_AS.split(",")]
+    # Show the plot in Streamlit
+    st.plotly_chart(fig)
 
-# input_string_BS = st.text_input("Elastic Metric BS (Use comma-seperated values)", "0.5")
-# BS = [float(num) for num in input_string_BS.split(",")]
-# # AS = [1, 2, 0.75, 0.5, 0.25, 0.01] #, 1.6] #, 1.4, 1.2, 1, 0.5, 0.2, 0.1]
-# # BS = [0.5, 1, 0.5, 0.5, 0.5, 0.5] #, 2, 2, 2, 2, 2, 2, 2]
+    # Create a new figure
+    fig = go.Figure()
 
+    # Loop through the geod_points and add a line plot for each time point
+    for i in range(1, n_times - 1):
+        fig.add_trace(
+            go.Scatter(
+                x=geod_points[i, :, 0],
+                y=geod_points[i, :, 1],
+                mode="lines+markers",
+                marker=dict(size=8, color="goldenrod", symbol="circle"),
+                line=dict(color="goldenrod", dash="dashdot"),
+                hoverinfo="x+y",
+                name=f"Time {i}",
+            )
+        )
 
-# for a, b in zip(AS, BS):
-#     ELASTIC_METRIC[a, b] = CURVES_SPACE.metric.geodesic(
-#         initial_point=a, end_point=b
-#     )  # .elastic_metric
-# METRICS = {}
-# METRICS["Linear"] = L2_METRIC
-# METRICS["SRV"] = SRV_METRIC
-
-
-# means = {}
-
-# means["Linear"] = gs.mean(cell_shapes, axis=0)
-# means["SRV"] = (
-#     FrechetMean(metric=SRV_METRIC, method="default").fit(cell_shapes).estimate_
-# )
-
-
-# for a, b in zip(AS, BS):
-#     means[a, b] = (
-#         FrechetMean(metric=ELASTIC_METRIC[a, b], method="default")
-#         .fit(cell_shapes)
-#         .estimate_
-#     )
-
-
-# fig = plt.figure(figsize=(18, 8))
-
-# ncols = len(means) // 2
-
-# for i, (mean_name, mean) in enumerate(means.items()):
-#     ax = fig.add_subplot(2, ncols, i+1)
-#     ax.plot(mean[:, 0], mean[:, 1], "black")
-#     ax.set_aspect("equal")
-#     ax.axis("off")
-#     axs_title = mean_name
-#     if mean_name not in ["Linear", "SRV"]:
-#         a = mean_name[0]
-#         b = mean_name[1]
-#         ratio = a / (2 * b)
-#         mean_name = f"Elastic {mean_name}\n a / (2b) = {ratio}"
-#     ax.set_title(mean_name)
-
-# st.pyplot(fig)
-
-
-# fig = plt.figure(figsize=(18, 8))
-
-# ncols = len(means) // 2
-
-# for i, (mean_name, mean) in enumerate(means.items()):
-#     ax = fig.add_subplot(2, ncols, i+1)
-#     mean = CLOSED_CURVES_SPACE.projection(mean)
-#     ax.plot(mean[:, 0], mean[:, 1], "black")
-#     ax.set_aspect("equal")
-#     ax.axis("off")
-#     axs_title = mean_name
-#     if mean_name not in ["Linear", "SRV"]:
-#         a = mean_name[0]
-#         b = mean_name[1]
-#         ratio = a / (2 * b)
-#         mean_name = f"Elastic {mean_name}\n a / (2b) = {ratio}"
-#     ax.set_title(mean_name)
-
-# st.pyplot(fig)
-# st.write(cell_shapes)
-cell_shapes = gs.array(cell_shapes)
-
-
-means = FrechetMean(CURVES_SPACE_SRV)
-# st.write(means)
-means.fit(cell_shapes[:500])
-
-mean_estimate = means.estimate_
-
-# plt.plot(mean_estimate[:, 0], mean_estimate[:, 1], "black")
-
-# Extract x and y coordinates
-x_coords = mean_estimate[:, 0]
-y_coords = mean_estimate[:, 1]
-
-line_color = "rgb(255, 0, 191)"
-
-# Create a Plotly scatter plot
-fig = go.Figure(
-    data=go.Scatter(x=x_coords, y=y_coords, mode="lines", line=dict(color=line_color))
-)
-
-# Customize layout
-fig.update_layout(
-    title="Mean Estimate",
-    xaxis_title="X-axis",
-    yaxis_title="Y-axis",
-)
-
-# Display the Plotly figure in Streamlit
-st.plotly_chart(fig)
-
-
-mean_estimate_clean = mean_estimate[~gs.isnan(gs.sum(mean_estimate, axis=1)), :]
-mean_estimate_aligned = 1.55 * (
-    mean_estimate_clean - gs.mean(mean_estimate_clean, axis=0)
-)
-
-
-# Create a Plotly figure
-fig = go.Figure()
-
-# Plot cell shapes
-for cell in cell_shapes:
+    # Add the start cell (blue line plot)
     fig.add_trace(
         go.Scatter(
-            x=cell[:, 0],
-            y=cell[:, 1],
-            mode="lines",
-            line=dict(color="lightgrey", width=1),
+            x=geod_points[0, :, 0],
+            y=geod_points[0, :, 1],
+            mode="lines+markers",
+            marker=dict(size=10, color="blue", symbol="circle"),
+            line=dict(color="blue"),
+            hoverinfo="x+y",
+            name="Start Cell",
         )
     )
 
-# Plot mean estimate
-fig.add_trace(
-    go.Scatter(
-        x=mean_estimate_aligned[:, 0],
-        y=mean_estimate_aligned[:, 1],
-        mode="lines",
-        line=dict(color="black", width=2),
-        name="Mean cell",
+    # Add the end cell (red line plot)
+    fig.add_trace(
+        go.Scatter(
+            x=geod_points[-1, :, 0],
+            y=geod_points[-1, :, 1],
+            mode="lines+markers",
+            marker=dict(size=10, color="red", symbol="circle"),
+            line=dict(color="red"),
+            hoverinfo="x+y",
+            name="End Cell",
+        )
     )
-)
 
-# Customize layout
-fig.update_layout(
-    title="Cell Shapes and Mean Estimate",
-    xaxis_title="X-axis",
-    yaxis_title="Y-axis",
-    legend=dict(font=dict(size=12)),
-)
-
-# Display the Plotly figure in Streamlit
-st.plotly_chart(fig)
-
-
-mean_estimate_aligned_bis = gs.vstack(
-    [mean_estimate_aligned[4:], mean_estimate_aligned[-1]]
-)
-
-
-cells_to_plot = cell_shapes[gs.random.randint(len(cell_shapes), size=300)]
-points_to_plot = cells_to_plot.reshape(-1, 2)
-
-z = gaussian_kde(points_to_plot.T)(points_to_plot.T)
-z_norm = z / z.max()
-
-# Create a Plotly figure
-fig = go.Figure()
-
-# Scatter plot for points
-fig.add_trace(
-    go.Scatter(
-        x=points_to_plot[:, 0],
-        y=points_to_plot[:, 1],
-        mode="markers",
-        marker=dict(color=z_norm, size=10, opacity=0.2),
+    # Update the layout to add a title, gridlines, and axis labels
+    fig.update_layout(
+        title="Geodesic for the Square Root Velocity metric",
+        xaxis=dict(title="X-axis Label", gridcolor="lightgray"),
+        yaxis=dict(title="Y-axis Label", gridcolor="lightgray"),
+        plot_bgcolor="white",
     )
-)
 
-# Plot mean estimate
-fig.add_trace(
-    go.Scatter(
-        x=mean_estimate_aligned_bis[:, 0],
-        y=mean_estimate_aligned_bis[:, 1],
-        mode="lines",
-        line=dict(color="black", width=2),
-        name="Mean cell",
+    # Display the plot
+    st.plotly_chart(fig)
+# st.write(cell_shapes[0], cell_lines[0], treatment[0])
+
+
+cell_shapes = gs.array(st.session_state["cell_shapes"])
+
+compute_mean_shape = st.sidebar.toggle("Compute Mean Shape")
+
+if compute_mean_shape:
+    st.header("Explore Geodesic Trajectory Joining Two Cell Shapes")
+    means = FrechetMean(CURVES_SPACE_SRV)
+    # st.write(means)
+    means.fit(cell_shapes[:500])
+
+    mean_estimate = means.estimate_
+
+    # plt.plot(mean_estimate[:, 0], mean_estimate[:, 1], "black")
+
+    # Extract x and y coordinates
+    x_coords = mean_estimate[:, 0]
+    y_coords = mean_estimate[:, 1]
+
+    line_color = "rgb(255, 0, 191)"
+
+    # Create a Plotly scatter plot
+    fig = go.Figure(
+        data=go.Scatter(
+            x=x_coords, y=y_coords, mode="lines", line=dict(color=line_color)
+        )
     )
-)
 
-# Customize layout
-fig.update_layout(
-    title="Global mean shape superimposed on the dataset of cells",
-    xaxis_title="X-axis",
-    yaxis_title="Y-axis",
-    legend=dict(font=dict(size=12)),
-    title_font_size=14,
-)
+    # Customize layout
+    fig.update_layout(
+        title="Mean Estimate",
+        xaxis_title="X-axis",
+        yaxis_title="Y-axis",
+    )
 
-# Display the Plotly figure in Streamlit
-st.plotly_chart(fig)
+    # Display the Plotly figure in Streamlit
+    st.plotly_chart(fig)
+
+    mean_estimate_clean = mean_estimate[~gs.isnan(gs.sum(mean_estimate, axis=1)), :]
+    mean_estimate_aligned = 1.55 * (
+        mean_estimate_clean - gs.mean(mean_estimate_clean, axis=0)
+    )
+
+    # Create a Plotly figure
+    fig = go.Figure()
+
+    # Plot cell shapes
+    for cell in cell_shapes:
+        fig.add_trace(
+            go.Scatter(
+                x=cell[:, 0],
+                y=cell[:, 1],
+                mode="lines",
+                line=dict(color="lightgrey", width=1),
+            )
+        )
+
+    # Plot mean estimate
+    fig.add_trace(
+        go.Scatter(
+            x=mean_estimate_aligned[:, 0],
+            y=mean_estimate_aligned[:, 1],
+            mode="lines",
+            line=dict(color="black", width=2),
+            name="Mean cell",
+        )
+    )
+
+    # Customize layout
+    fig.update_layout(
+        title="Cell Shapes and Mean Estimate",
+        xaxis_title="X-axis",
+        yaxis_title="Y-axis",
+        legend=dict(font=dict(size=12)),
+    )
+
+    # Display the Plotly figure in Streamlit
+    st.plotly_chart(fig)
+
+    mean_estimate_aligned_bis = gs.vstack(
+        [mean_estimate_aligned[4:], mean_estimate_aligned[-1]]
+    )
+
+    cells_to_plot = cell_shapes[gs.random.randint(len(cell_shapes), size=300)]
+    points_to_plot = cells_to_plot.reshape(-1, 2)
+
+    z = gaussian_kde(points_to_plot.T)(points_to_plot.T)
+    z_norm = z / z.max()
+
+    # Create a Plotly figure
+    fig = go.Figure()
+
+    # Scatter plot for points
+    fig.add_trace(
+        go.Scatter(
+            x=points_to_plot[:, 0],
+            y=points_to_plot[:, 1],
+            mode="markers",
+            marker=dict(color=z_norm, size=10, opacity=0.2),
+        )
+    )
+
+    # Plot mean estimate
+    fig.add_trace(
+        go.Scatter(
+            x=mean_estimate_aligned_bis[:, 0],
+            y=mean_estimate_aligned_bis[:, 1],
+            mode="lines",
+            line=dict(color="black", width=2),
+            name="Mean cell",
+        )
+    )
+
+    # Customize layout
+    fig.update_layout(
+        title="Global mean shape superimposed on the dataset of cells",
+        xaxis_title="X-axis",
+        yaxis_title="Y-axis",
+        legend=dict(font=dict(size=12)),
+        title_font_size=14,
+    )
+
+    # Display the Plotly figure in Streamlit
+    st.plotly_chart(fig)
 
 # import numpy as np
 

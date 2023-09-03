@@ -346,6 +346,9 @@ z_data = [0] * len(
 
 # Define a custom color for the line plot
 line_color = "rgb(255, 0, 191)"  # Adjust the RGB values as per your preference
+hover_text = [
+    f"{st.session_state['cell_lines'][cell_num]}, {st.session_state.treatment[cell_num]}"
+] * len(x_data)
 
 # Create a 3D trace for the cell data
 trace = go.Scatter3d(
@@ -354,12 +357,18 @@ trace = go.Scatter3d(
     z=z_data,
     mode="lines",
     line=dict(color=line_color),
+    hovertext=hover_text,
+    hoverinfo="text",
 )
 
 # Create the layout for the 3D plot
 layout = go.Layout(
     title="Preview of 2D Cell Data in 3D Space",
-    scene=dict(xaxis_title="X", yaxis_title="Y", zaxis_title="Z"),
+    scene=dict(
+        xaxis_title="X",
+        yaxis_title="Y",
+        zaxis_title="Z",
+    ),
 )
 
 # Create the Figure object and add the trace to it
@@ -369,7 +378,7 @@ fig = go.Figure(data=trace, layout=layout)
 st.plotly_chart(fig)
 
 
-st.dataframe(st.session_state.cells_list[cell_num])
+# st.dataframe(st.session_state.cells_list[cell_num])
 
 
 # config_option = st.radio(
