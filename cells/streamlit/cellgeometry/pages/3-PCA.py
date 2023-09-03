@@ -17,17 +17,16 @@ st.sidebar.header("STEP 3: PCA")
 
 st.write("# Principal Component Analysis (PCA) 👋")
 
-
-cells = st.session_state["cells"]
-cell_shapes = st.session_state["cell_shapes"]
-if cells.size == 0:
+if "cells" not in st.session_state:
     st.warning(
         "👈 Have you uploaded a zipped file of ROIs under Load Data? Afterwards, go the the Cell Shear page and run the analysis there."
     )
     st.stop()
+cells = st.session_state["cells"]
+cell_shapes = st.session_state["cell_shapes"]
 
 
-cells_flat = gs.reshape(cells, (len(cells), -1))
+cells_flat = gs.reshape(cell_shapes, (len(cell_shapes), -1))
 # st.write("Cells flat", len(cells))
 
 R1 = Euclidean(dim=1)
@@ -97,15 +96,15 @@ st.write("You selected:", dist_options)
 # PCA(n_components).fit(logs)
 
 
-CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2))
-mean = FrechetMean(CURVES_SPACE_SRV).fit(cell_shapes)
-logs = []
-for one_cell in cell_shapes:
-    one_log = CURVES_SPACE_SRV.metric.log(one_cell, base_point=mean.estimate_)
-    logs.append(one_log)
-logs = gs.array(logs)  # same shape as cell_shapes here
-logs = gs.reshape(logs, (len(cells), -1))
-PCA(n_components).fit(logs)
+# CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2))
+# mean = FrechetMean(CURVES_SPACE_SRV).fit(cell_shapes)
+# logs = []
+# for one_cell in cell_shapes:
+#     one_log = CURVES_SPACE_SRV.metric.log(one_cell, base_point=mean.estimate_)
+#     logs.append(one_log)
+# logs = gs.array(logs)  # same shape as cell_shapes here
+# logs = gs.reshape(logs, (len(cells), -1))
+# PCA(n_components).fit(logs)
 
 # for one_shape in cells_flat:
 #     one_log = CURVES_SPACE_SRV.metric.log(one_shape, base_point=mean.estimate_)
@@ -139,6 +138,7 @@ PCA(n_components).fit(logs)
 #     first_pc_explains = 100*sum(pcas[metric_name].explained_variance_ratio_[:1])
 #     axs[i].set_title(f"{tangent}PCA with {metric_name} metric\n 1st PC explains: {first_pc_explains:.1f}%")
 
+st.stop()
 
 st.write("## PCA Analysis")
 
