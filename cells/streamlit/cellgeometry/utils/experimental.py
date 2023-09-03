@@ -9,12 +9,13 @@ from geomstats.geometry.pre_shape import PreShapeSpace
 from skimage import measure
 from skimage.filters import threshold_otsu
 import streamlit as st
+from joblib import Parallel, delayed
 
 M_AMBIENT = 2
 
 
 if "n_sampling_points" not in st.session_state:
-    st.session_state["n_sampling_points"] = 50
+    st.session_state["n_sampling_points"] = 200
     n_sampling_points = st.session_state["n_sampling_points"]
 else:
     n_sampling_points = st.session_state["n_sampling_points"]
@@ -76,30 +77,50 @@ def _tif_video_to_lists(tif_path):
     return contours_list, imgs_list
 
 
-def _interpolate(curve, n_sampling_points):
-    """Interpolate a discrete curve with nb_points from a discrete curve.
+# def _interpolate(curve, n_sampling_points):
+#     """Interpolate a discrete curve with nb_points from a discrete curve.
 
-    Parameters
-    ----------
-    curve : array-like, shape=[n_points, 2]
-    n_sampling_points : int
+#     Parameters
+#     ----------
+#     curve : array-like, shape=[n_points, 2]
+#     n_sampling_points : int
+
+#     Returns
+#     -------
+#     interpolation : array-like, shape=[n_sampling_points, 2]
+#        Discrete curve with n_sampling_points
+#     """
+#     old_length = curve.shape[0]
+#     interpolation = np.zeros((n_sampling_points, 2))
+#     incr = old_length / n_sampling_points
+#     pos = np.array(0.0, dtype=np.float32)
+#     for i in range(n_sampling_points):
+#         index = int(np.floor(pos))
+#         interpolation[i] = curve[index] + (pos - index) * (
+#             curve[(index + 1) % old_length] - curve[index]
+#         )
+#         pos += incr
+#     return gs.array(interpolation, dtype=gs.float32)
+
+
+def _interpolate(curve, nb_points):
+    """Interpolate a discrete curve with nb_points from a discrete curve.
 
     Returns
     -------
-    interpolation : array-like, shape=[n_sampling_points, 2]
-       Discrete curve with n_sampling_points
+    interpolation : discrete curve with nb_points points
     """
     old_length = curve.shape[0]
-    interpolation = np.zeros((n_sampling_points, 2))
-    incr = old_length / n_sampling_points
-    pos = np.array(0.0, dtype=np.float32)
-    for i in range(n_sampling_points):
-        index = int(np.floor(pos))
+    interpolation = gs.zeros((nb_points, 2))
+    incr = old_length / nb_points
+    pos = 0
+    for i in range(nb_points):
+        index = int(gs.floor(pos))
         interpolation[i] = curve[index] + (pos - index) * (
             curve[(index + 1) % old_length] - curve[index]
         )
         pos += incr
-    return gs.array(interpolation, dtype=gs.float32)
+    return interpolation
 
 
 def _remove_consecutive_duplicates(curve, tol=1e-2):
@@ -289,8 +310,13 @@ def nolabel_preprocess(
                 f"Cell boundaries have {n_sampling_points} samplings points."
             )
             interpolated_cells = gs.zeros((n_cells, n_sampling_points, 2))
-            for i_cell, cell in enumerate(cells):
-                interpolated_cells[i_cell] = _interpolate(cell, n_sampling_points)
+            # for i_cell, cell in enumerate(cells):
+            #     interpolated_cells[i_cell] = _interpolate(cell, n_sampling_points)
+
+            # Parallelize the interpolation while preserving order
+            interpolated_cells = Parallel(n_jobs=10, backend="threading")(
+                delayed(_interpolate)(cell, n_sampling_points) for cell in cells
+            )
 
             cells = interpolated_cells
 
@@ -298,26 +324,33 @@ def nolabel_preprocess(
         for i_cell, cell in enumerate(cells):
             cells[i_cell] = _remove_consecutive_duplicates(cell)
 
-        st.write("Cells: Quotienting Translation.")
-        print("\n- ")
-        cells = cells - gs.mean(cells, axis=-2)[..., None, :]
+        for i_cell, cell in enumerate(cells):
+            cells[i_cell] = PRESHAPE_SPACE.projection(cell)
+
         cell_shapes = gs.zeros_like(cells)
+        for i_cell, cell_shape in enumerate(cells):
+            cell_shapes[i_cell] = _exhaustive_align(cell_shape, cells[0])
 
-        if "scaling" in quotient:
-            st.write("Cell shapes: quotienting scaling (length).")
-            for i_cell, cell in enumerate(cells):
-                cell_shapes[i_cell] = cell / basic.perimeter(cell)
+        # st.write("Cells: Quotienting Translation.")
+        # print("\n- ")
+        # cells = cells - gs.mean(cells, axis=-2)[..., None, :]
+        # cell_shapes = gs.zeros_like(cells)
 
-        if "rotation" in quotient:
+        # if "scaling" in quotient:
+        #     st.write("Cell shapes: quotienting scaling (length).")
+        #     for i_cell, cell in enumerate(cells):
+        #         cell_shapes[i_cell] = cell / basic.perimeter(cell)
 
-            st.write("Cell shapes: Quotienting Rotation.")
-            # print("- Cell shapes: quotienting rotation.")
-            if "scaling" not in quotient:
-                for i_cell, cell_shape in enumerate(cells):
-                    cell_shapes[i_cell] = _exhaustive_align(cell_shape, cells[0])
-            else:
-                for i_cell, cell_shape in enumerate(cell_shapes):
-                    cell_shapes[i_cell] = _exhaustive_align(cell_shape, cell_shapes[0])
+        # if "rotation" in quotient:
+
+        #     st.write("Cell shapes: Quotienting Rotation.")
+        #     # print("- Cell shapes: quotienting rotation.")
+        #     if "scaling" not in quotient:
+        #         for i_cell, cell_shape in enumerate(cells):
+        #             cell_shapes[i_cell] = _exhaustive_align(cell_shape, cells[0])
+        #     else:
+        #         for i_cell, cell_shape in enumerate(cell_shapes):
+        #             cell_shapes[i_cell] = _exhaustive_align(cell_shape, cell_shapes[0])
 
         status.update(label="Preprocessing complete!", state="complete", expanded=False)
 

@@ -35,20 +35,50 @@ st.markdown(
 
 upload_folder = st.session_state["selected_dataset"]
 cells_list = st.session_state["cells_list"]
-
-n_sampling_points = st.slider("Select the Number of Sampling Points", 0, 250, 50)
+# st.session_state["cell_shapes"] = None
+# st.write(st.session_state["cell_shapes"])
+n_sampling_points = st.slider("Select the Number of Sampling Points", 0, 250, 150)
 st.session_state["n_sampling_points"] = n_sampling_points
-cells, cell_shapes = experimental.nolabel_preprocess(
-    cells_list, len(cells_list), n_sampling_points
-)
-st.write(cell_shapes.shape)
-st.session_state["cells"] = cells
-st.session_state["cell_shapes"] = cell_shapes
 
+if "cell_shapes" not in st.session_state:
+    cells, cell_shapes = experimental.nolabel_preprocess(
+        cells_list, len(cells_list), n_sampling_points
+    )
+    st.write(cell_shapes.shape)
+    st.session_state["cells"] = cells
+    st.session_state["cell_shapes"] = cell_shapes
 
-R1 = Euclidean(dim=1)
+if st.session_state["cell_lines"] is not None:
+    cell_lines = st.session_state["cell_lines"]
+    exp_geo_traj = st.sidebar.checkbox("Explore Geodesic Trajectory")
+
+if st.session_state["treatment"] is not None:
+    treatment = st.session_state["treatment"]
+
+# st.write(cell_shapes[0], cell_lines[0], treatment[0])
+
 CLOSED_CURVES_SPACE = ClosedDiscreteCurves(Euclidean(dim=2))
 CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2), k_sampling_points=n_sampling_points)
+
+
+if exp_geo_traj:
+    st.header("Explore Geodesic Trajectory Joining Two Cell Shapes")
+
+    # i_start_rand = gs.random.randint(len(ds_proj["control"]["dunn"]))
+    # i_end_rand = gs.random.randint(len(ds_proj["control"]["dlm8"]))
+
+    # cell_start = ds_align["control"]["dunn"][i_start_rand]
+    # cell_end = ds_align["control"]["dlm8"][i_end_rand]
+
+    # print(i_start_rand, i_end_rand)
+
+    # geodesic_func = CURVES_SPACE_SRV.metric.geodesic(initial_point=cell_start, end_point=cell_end)
+
+    # n_times = 30
+    # times = gs.linspace(0.0, 1.0, n_times)
+    # geod_points = geodesic_func(times)
+
+
 # SRV_METRIC = CURVES_SPACE.srv_metric
 # L2_METRIC = CURVES_SPACE.l2_curves_metric
 
@@ -135,7 +165,7 @@ cell_shapes = gs.array(cell_shapes)
 
 means = FrechetMean(CURVES_SPACE_SRV)
 # st.write(means)
-means.fit(cell_shapes)
+means.fit(cell_shapes[:500])
 
 mean_estimate = means.estimate_
 
@@ -211,7 +241,7 @@ mean_estimate_aligned_bis = gs.vstack(
 )
 
 
-cells_to_plot = cell_shapes[gs.random.randint(len(cell_shapes), size=500)]
+cells_to_plot = cell_shapes[gs.random.randint(len(cell_shapes), size=300)]
 points_to_plot = cells_to_plot.reshape(-1, 2)
 
 z = gaussian_kde(points_to_plot.T)(points_to_plot.T)

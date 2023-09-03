@@ -222,6 +222,8 @@ st.markdown(
             Your labels should be in a `.csv` or `.txt` file. Within this file, each row corresponds to the cell number and that row should contain the label for that cell. For example, if you have 10 cells, your file should have 10 rows. The first row should be the label for cell 0, the second row should be the label for cell 1, and so on. The label can be any string, but it should be unique for each cell.
 
             For example, if you are uploading the treatments for each cell you can use `control`, `cytd`, `jasp`, etc.
+
+            _NOTE_, if you do not have labels, you can skip this step.
             """
 )
 
@@ -272,7 +274,7 @@ st.divider()
 
 hasCellLines = st.checkbox("Cell Lines")
 
-cell_line_col1, cell_line_col2 = st.columns([0.8, 0.2])
+cell_line_col1, cell_line_col2 = st.columns([0.8, 0.2], gap="medium")
 with cell_line_col1:
     if hasCellLines:
         uploaded_labels = st.file_uploader(
@@ -320,6 +322,7 @@ if st.session_state.cells_list == True:
     st.warning("Please upload a zipped file of ROIs or a CSV/TXT file.")
     st.stop()
 
+st.divider()
 
 st.markdown("## Preview of Cell Data")
 
