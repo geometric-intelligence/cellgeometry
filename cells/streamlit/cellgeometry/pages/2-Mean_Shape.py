@@ -14,8 +14,8 @@ st.sidebar.header("STEP 2: Compute Mean Shape")
 
 st.write("# Compute Mean Shape")
 
-if not st.session_state["selected_dataset"]:
-    st.warning("👈 Please upload a zipped file of ROIs under Load Data")
+if "selected_dataset" not in st.session_state:
+    st.warning("👈 Please upload or Select Data from __Load Data__")
     st.stop()
 
 # Display the uploaded data

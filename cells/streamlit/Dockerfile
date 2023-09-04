@@ -13,7 +13,8 @@ RUN pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
     poetry install --no-dev
 
-RUN pip install git+https://github.com/geomstats/geomstats.git
+RUN pip install git+https://github.com/geomstats/geomstats.git && \
+    pip install pacmap
 
 # Copy the entire project directory into the container
 COPY cellgeometry .
@@ -25,7 +26,7 @@ EXPOSE 8501
 ENV PYTHONPATH "${PYTHONPATH}:/app/utils"
 
 # The HEALTHCHECK instruction tells Docker how to test a container to check that it is still working
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+# HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
 # Set the entrypoint command to run the Streamlit app
 CMD ["streamlit", "run", "Hello.py", "--server.port=8501"]

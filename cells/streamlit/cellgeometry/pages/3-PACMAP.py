@@ -13,43 +13,61 @@ from plotly.subplots import make_subplots
 import streamlit as st
 
 
-st.sidebar.header("STEP 3: PCA")
+st.sidebar.header("STEP 3: PACMAP")
 
-st.write("# Principal Component Analysis (PCA) 👋")
+st.write("# Dimension Reduction using PACMAP 👋")
+
+st.markdown(
+    """
+PaCMAP (Pairwise Controlled Manifold Approximation) is a dimensionality reduction method that can be used for visualization, preserving both local and global structure of the data in original space.
+"""
+)
 
 if "cells" not in st.session_state:
     st.warning(
-        "👈 Have you uploaded a zipped file of ROIs under Load Data? Afterwards, go the the Cell Shear page and run the analysis there."
+        "👈 Have you uploaded a zipped file of ROIs under Load Data? Afterwards, go the the Mean Shape page and run the analysis there."
     )
     st.stop()
 cells = st.session_state["cells"]
 cell_shapes = st.session_state["cell_shapes"]
 
 
+if st.session_state["cell_lines"] is not None:
+    cell_lines = st.session_state["cell_lines"]
+    if st.session_state["treatment"] is not None:
+        treatment = st.session_state["treatment"]
+
+
 cells_flat = gs.reshape(cell_shapes, (len(cell_shapes), -1))
-# st.write("Cells flat", len(cells))
+# st.write("Cells flat", cells_flat.shape)
 
 R1 = Euclidean(dim=1)
 CLOSED_CURVES_SPACE = ClosedDiscreteCurves(Euclidean(dim=2))
 CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2))
 mean = FrechetMean(CURVES_SPACE_SRV).fit(cell_shapes)
 
-n_components = st.slider("Select the Number of Sampling Points", 0, len(cells_flat), 10)
+# n_components = st.slider("Select the Number of Sampling Points", 0, len(cells_flat), 10)
 
-st.write(cell_shapes.shape)
+# st.write(treatment.shape)
 # Perform PacMap dimensionality reduction
 model = pacmap.PaCMAP()
 embedding = model.fit_transform(cells_flat)
+# st.write(embedding.shape)
 
 # Visualize the embedding using Plotly Express
+# Create a scatter plot with coloring based on 'cell_lines' and symbols based on 'treatments'
 fig = px.scatter(
     x=embedding[:, 0],
     y=embedding[:, 1],
+    color=gs.squeeze(cell_lines),  # differentiate by color based on cell_lines
+    symbol=gs.squeeze(treatment),  # differentiate by symbol based on treatments
     title="PacMap Embedding",
     labels={"x": "Dimension 1", "y": "Dimension 2"},
+    color_discrete_sequence=px.colors.qualitative.Set1,  # use a color palette
 )
 
-# st.write(cell_shapes.shape[0] * cell_shapes.shape[1])
+# Update layout for better clarity, if needed
+fig.update_layout(legend_title_text="Cell Lines", legend_itemsizing="constant")
 
 # Display the Plotly figure in Streamlit
 st.plotly_chart(fig)
@@ -60,34 +78,44 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown("##### Number of Components")
     n_components = st.number_input(
-        "Input dimensions of the embedded space. Default = 2",
+        "Default = 2",
         min_value=2,
         max_value=None,
     )
-    st.write("Selected number of components:  ", n_components)
+    st.write("Input dimensions of the embedded space.", n_components)
 
 with col2:
     st.markdown("##### Number of Neighbors")
     neighbors_num = st.number_input(
-        "Input number of neighbors considered for nearest neighbor pairs for local structure preservation. Default = 10 ",
+        "Default = 10 ",
         min_value=1,
         max_value=None,
     )
-    st.write("Selected number of neighbors:  ", neighbors_num)
+    st.write(
+        "Input number of neighbors considered for nearest neighbor pairs for local structure preservation."
+    )
 
 with col3:
     st.markdown("##### Learning Rate")
     lr = st.number_input("Input learning rate. Default = 1.0")
-    st.write("The learning rate is ", lr)
+    st.write("The learning rate is ")
 
 dist_options = st.selectbox(
-    "Select distance metric. Default = euclidean",
+    "Default = euclidean",
     ("euclidean", "manhattan", "angular", "hamming"),
 )
 
-st.write("You selected:", dist_options)
+st.write("Select distance metric.")
 
+st.markdown(
+    """ ### Background on PACMAP
 
+PaCMAP optimizes the low dimensional embedding using three kinds of pairs of points: neighbor pairs (pair_neighbors), mid-near pair (pair_MN), and further pairs (pair_FP).
+
+Previous dimensionality reduction techniques focus on either local structure (e.g. t-SNE, LargeVis and UMAP) or global structure (e.g. TriMAP), but not both, although with carefully tuning the parameter in their algorithms that controls the balance between global and local structure, which mainly adjusts the number of considered neighbors. Instead of considering more neighbors to attract for preserving glocal structure, PaCMAP dynamically uses a special group of pairs -- mid-near pairs, to first capture global structure and then refine local structure, which both preserve global and local structure. For a thorough background and discussion on this work, please read [the paper](https://jmlr.org/papers/v22/20-1061.html).
+
+"""
+)
 # pcas = {}
 
 # st.write(mean.estimate_)

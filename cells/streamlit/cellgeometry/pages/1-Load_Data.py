@@ -19,6 +19,10 @@ import glob
 st.sidebar.header("STEP 1: Load Data")
 sys.path.append("/app/utils")
 
+if "username" not in st.session_state:
+    st.warning("Verify your login by returning to the Hello page.")
+    st.stop()
+
 # How we get the current user after successful login
 username = st.session_state["username"]
 
