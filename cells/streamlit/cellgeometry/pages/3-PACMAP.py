@@ -23,7 +23,7 @@ PaCMAP (Pairwise Controlled Manifold Approximation) is a dimensionality reductio
 """
 )
 
-if "cells" not in st.session_state:
+if "cell_shapes" not in st.session_state:
     st.warning(
         "👈 Have you uploaded a zipped file of ROIs under Load Data? Afterwards, go the the Mean Shape page and run the analysis there."
     )
@@ -38,13 +38,13 @@ if st.session_state["cell_lines"] is not None:
         treatment = st.session_state["treatment"]
 
 
-cells_flat = gs.reshape(cell_shapes, (len(cell_shapes), -1))
+cells_flat = gs.reshape(cells, (len(cell_shapes), -1))
 # st.write("Cells flat", cells_flat.shape)
 
-R1 = Euclidean(dim=1)
-CLOSED_CURVES_SPACE = ClosedDiscreteCurves(Euclidean(dim=2))
-CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2))
-mean = FrechetMean(CURVES_SPACE_SRV).fit(cell_shapes)
+# R1 = Euclidean(dim=1)
+# CLOSED_CURVES_SPACE = ClosedDiscreteCurves(Euclidean(dim=2))
+# CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2))
+# mean = FrechetMean(CURVES_SPACE_SRV).fit(cell_shapes)
 
 # n_components = st.slider("Select the Number of Sampling Points", 0, len(cells_flat), 10)
 

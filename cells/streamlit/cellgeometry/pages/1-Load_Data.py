@@ -15,13 +15,24 @@ import streamlit as st
 import pandas as pd
 import glob
 
+# How we get the current user after successful login
+from streamlit.web.server.websocket_headers import _get_websocket_headers
+
+headers = _get_websocket_headers()
+access_token = headers.get("X-Forwarded-User")
+st.session_state["username"] = access_token
 
 st.sidebar.header("STEP 1: Load Data")
 sys.path.append("/app/utils")
 
 if "username" not in st.session_state:
-    st.warning("Verify your login by returning to the Hello page.")
-    st.stop()
+    try:
+        headers = _get_websocket_headers()
+        access_token = headers.get("X-Forwarded-User")
+        st.session_state["username"] = access_token
+    except:
+        st.warning("Verify your login by returning to the Hello page.")
+        st.stop()
 
 # How we get the current user after successful login
 username = st.session_state["username"]
