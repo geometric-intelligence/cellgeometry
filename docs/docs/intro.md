@@ -2,46 +2,22 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# Getting Started
 
-Let's discover **Docusaurus in less than 5 minutes**.
+## 📝 Project Description 
 
-## Getting Started
+This project focuses on the analysis and comparison of biological cell shapes using elastic metrics implemented in Geomstats. The shapes of biological cells are determined by various processes and biophysical forces, which play a crucial role in cellular functions. By utilizing quantitative measures that reflect cellular morphology, this project aims to leverage large-scale biological cell image data for morphological studies.
 
-Get started by **creating a new site**.
+The analysis of cell shapes has significant applications in various domains. One notable application is the accurate classification and discrimination of cancer cell lines treated with different drugs. Measures of irregularity and spreading of cells can provide valuable insights for understanding the effects of drug treatments.
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+## 🎯 Features
 
-### What you'll need
+- Quantitative analysis and comparison of biological cell shapes using Geomstats.
+- Utilization of elastic metrics implemented in Geomstats for shape analysis.
+- Calculation of measures reflecting cellular morphology, facilitating in-depth characterization of cell shapes.
+- Leveraging large-scale biological cell image data for comprehensive morphological studies.
+- Framework for optimal matching, deforming, and comparing cell shapes using geodesics and geodesic distances.
+- Visualization of cellular shape variations, aiding in the interpretation and communication of analysis results.
+- User-friendly Streamlit app interface for seamless analysis, visualization, and interaction with biological cell data.
+- Comprehensive set of tools and methods, empowering researchers and scientists in cellular biology to gain insights and make discoveries.
 
-- [Node.js](https://nodejs.org/en/download/) version 16.14 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
-
-## Generate a new site
-
-Generate a new Docusaurus site using the **classic template**.
-
-The classic template will automatically be added to your project after you run the command:
-
-```bash
-npm init docusaurus@latest my-website classic
-```
-
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
