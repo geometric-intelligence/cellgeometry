@@ -9,6 +9,7 @@ from utils.data_utils import (
     parse_coordinates,
     get_file_or_folder_type,
     get_csv_txt_files,
+    close_curve,
 )
 import plotly.graph_objects as go
 import streamlit as st
@@ -54,6 +55,7 @@ if "current_time_string" not in st.session_state:
     current_time_string = f"{year}{day_of_year}-{time_string}"
     st.session_state["current_time_string"] = current_time_string
 
+st.session_state["cell_shapes"] = None
 
 if "cells_list" not in st.session_state:
     st.session_state["cells_list"] = True
@@ -353,8 +355,8 @@ cell_num = st.number_input(
 )
 
 # Sample data. Replace this with st.session_state.cells_list[cell_num]
-x_data = st.session_state.cells_list[cell_num][:, 0]
-y_data = st.session_state.cells_list[cell_num][:, 1]
+x_data = close_curve(st.session_state.cells_list[cell_num][:, 0])
+y_data = close_curve(st.session_state.cells_list[cell_num][:, 1])
 z_data = [0] * len(
     x_data
 )  # Using a constant value for z, placing the line on the "floor" of the 3D space

@@ -38,7 +38,7 @@ if st.session_state["cell_lines"] is not None:
         treatment = st.session_state["treatment"]
 
 
-cells_flat = gs.reshape(cells, (len(cell_shapes), -1))
+cells_flat = gs.reshape(cell_shapes, (len(cell_shapes), -1))
 # st.write("Cells flat", cells_flat.shape)
 
 # R1 = Euclidean(dim=1)
@@ -53,6 +53,7 @@ cells_flat = gs.reshape(cells, (len(cell_shapes), -1))
 model = pacmap.PaCMAP()
 embedding = model.fit_transform(cells_flat)
 # st.write(embedding.shape)
+st.write(cell_lines.shape)
 
 # Visualize the embedding using Plotly Express
 # Create a scatter plot with coloring based on 'cell_lines' and symbols based on 'treatments'

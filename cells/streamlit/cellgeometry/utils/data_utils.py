@@ -276,3 +276,29 @@ def get_csv_txt_files(upload_folder):
     filtered_file_names = csv_file_names + txt_file_names
 
     return filtered_file_names
+
+
+def close_curve(curve):
+    """
+    Close a curve by connecting the last point to the first point.
+
+    Parameters:
+    curve (numpy.ndarray): Array containing the coordinates of points in the curve.
+
+    Returns:
+    numpy.ndarray: Closed curve with an extra line segment connecting the last and first points.
+    """
+    if len(curve) < 2:
+        raise ValueError("Curve must have at least two points to close.")
+
+    first_point = curve[0]
+    last_point = curve[-1]
+
+    # Check if the curve is already closed (first and last points are the same)
+    if np.array_equal(first_point, last_point):
+        return curve  # Curve is already closed
+
+    # Append the first point to the end of the curve to close it
+    closed_curve = np.append(curve, [first_point], axis=0)
+
+    return closed_curve

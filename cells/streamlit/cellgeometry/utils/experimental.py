@@ -324,12 +324,27 @@ def nolabel_preprocess(
         for i_cell, cell in enumerate(cells):
             cells[i_cell] = _remove_consecutive_duplicates(cell)
 
+        st.write("Projecting to pre-shape space.")
         for i_cell, cell in enumerate(cells):
             cells[i_cell] = PRESHAPE_SPACE.projection(cell)
 
+        st.write("Aligning cells to the reference cell.")
         cell_shapes = gs.zeros_like(cells)
         for i_cell, cell_shape in enumerate(cells):
             cell_shapes[i_cell] = _exhaustive_align(cell_shape, cells[0])
+
+        # cell_shapes = Parallel(n_jobs=10)(delayed(_exhaustive_align)(cell_shape, cells[0]) for cell_shape in cells)
+        # cell_shapes = gs.array(cell_shapes)
+
+        # Parallelize the first loop
+        # cells = Parallel(n_jobs=n_jobs)(delayed(remove_duplicates)(cell) for cell in cells)
+
+        # Parallelize the second loop
+        # cells = Parallel(n_jobs=n_jobs)(delayed(project_to_preshape)(cell) for cell in cells)
+
+        # # Parallelize the third loop
+        # reference = cells[0]
+        # cell_shapes = Parallel(n_jobs=n_jobs)(delayed(exhaustive_align)(cell_shape, reference) for cell_shape in cells)
 
         # st.write("Cells: Quotienting Translation.")
         # print("\n- ")

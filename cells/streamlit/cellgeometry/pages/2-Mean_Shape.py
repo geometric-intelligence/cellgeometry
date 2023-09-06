@@ -38,22 +38,27 @@ upload_folder = st.session_state["selected_dataset"]
 cells_list = st.session_state["cells_list"]
 # st.session_state["cell_shapes"] = None
 # st.write(st.session_state["cell_shapes"])
-n_sampling_points = st.slider("Select the Number of Sampling Points", 0, 250, 150)
-st.session_state["n_sampling_points"] = n_sampling_points
+# n_sampling_points = st.slider("Select the Number of Sampling Points", 0, 250, 150)
+st.session_state["n_sampling_points"] = 200
+
+n_sampling_points = st.session_state["n_sampling_points"]
 
 
 CLOSED_CURVES_SPACE = ClosedDiscreteCurves(Euclidean(dim=2))
 CURVES_SPACE_SRV = DiscreteCurves(Euclidean(dim=2), k_sampling_points=n_sampling_points)
 
+if st.session_state["cell_shapes"] is None:
+    cells, cell_shapes = experimental.nolabel_preprocess(
+        cells_list, len(cells_list), n_sampling_points
+    )
+    st.session_state["cells"] = cells
+    st.session_state["cell_shapes"] = cell_shapes
 
-cells, cell_shapes = experimental.nolabel_preprocess(
-    cells_list, len(cells_list), n_sampling_points
-)
 
-
+cells = st.session_state["cells"]
+cell_shapes = st.session_state["cell_shapes"]
 st.write(cell_shapes.shape)
-st.session_state["cells"] = cells
-st.session_state["cell_shapes"] = cell_shapes
+
 
 if st.session_state["cell_lines"] is not None:
     cell_lines = st.session_state["cell_lines"]
@@ -65,6 +70,8 @@ if st.session_state["cell_lines"] is not None:
 toggle_states = {}
 
 if exp_geo_traj:
+    st.header("Explore Geodesic Trajectory Joining Two Cell Shapes")
+
     col1, col2 = st.columns(2, gap="medium")
     with col1:
         selected_treatment = st.radio(
@@ -233,7 +240,7 @@ cell_shapes = gs.array(st.session_state["cell_shapes"])
 compute_mean_shape = st.sidebar.toggle("Compute Mean Shape")
 
 if compute_mean_shape:
-    st.header("Explore Geodesic Trajectory Joining Two Cell Shapes")
+    st.header("Explore Mean Shape")
     means = FrechetMean(CURVES_SPACE_SRV)
     # st.write(means)
     means.fit(cell_shapes[:500])
