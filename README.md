@@ -1,7 +1,8 @@
 ![Asset 5](https://github.com/bioshape-lab/cells/assets/22850980/344f448f-84a9-4f06-8527-8ddec210fb31)
 
 
-[![Docker](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml)
+[![Docker](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml)[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8322532.svg)](https://doi.org/10.5281/zenodo.8322532)
+
 
 [[__`CellGeometry App`__]](https://cellgeometry.ece.ucsb.edu)
 [[__`Docs`__]](https://bioshape-lab.github.io/cellgeometry/)
