@@ -11,10 +11,26 @@ st.session_state["username"] = access_token
 
 st.set_page_config(
     page_title="Welcome to Cell Shape Analysis",
-    page_icon=":rocket:",
+    page_icon=":milky_way:",
+    menu_items={
+        "Get Help": "https://bioshape-lab.github.io/cellgeometry/",
+        "Report a bug": "https://github.com/bioshape-lab/cellgeometry",
+        "About": """ # About CellGeometry
+A web-based app for Cell Shape Analysis. Proudly built at
+__University of California, Santa Barbara__.
+
+__Departments__: Electrical and Computer Engineering, Bioengineering
+
+__Core Maintainer__: Amil Khan _(Please file any issues on GitHub, but feel free to contact me with any questions or comments!)_
+
+## Cite Us
+
+https://zenodo.org/record/8322532/export/hx
+        """,
+    },
 )
 
-
+# st.help(st.set_page_config)
 st.sidebar.title("Cell Shape Analysis")
 st.sidebar.success("Select a demo above.")
 
