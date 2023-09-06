@@ -2,42 +2,131 @@
 sidebar_position: 1
 ---
 
-# Create a Page
+# 📘 Formatting your Input Data
 
-Add **Markdown or React** files to `src/pages` to create a **standalone page**:
+## Preparing your Data  
 
-- `src/pages/index.js` → `localhost:3000/`
-- `src/pages/foo.md` → `localhost:3000/foo`
-- `src/pages/foo/bar.js` → `localhost:3000/foo/bar`
+Greetings, Cell Shape Researcher! 🧪 Before you embark on your analysis, it's crucial to ensure that your data is formatted correctly for our application.
 
-## Create your first React Page
+### 📜 Format & Structure
 
-Create a file at `src/pages/my-react-page.js`:
+Your data should be presented in a text file with xy coordinates for each cell:
 
-```jsx title="src/pages/my-react-page.js"
-import React from 'react';
-import Layout from '@theme/Layout';
+- Each xy coordinate pair should be separated by a space.
+- Different cells should be distinguished with a line break.
 
-export default function MyReactPage() {
-  return (
-    <Layout>
-      <h1>My React page</h1>
-      <p>This is a React page</p>
-    </Layout>
-  );
-}
+**Example:**
+
+```
+x1 y1
+x2 y2
+x3 y3
+...
+
+x1 y1
+x2 y2
 ```
 
-A new page is now available at [http://localhost:3000/my-react-page](http://localhost:3000/my-react-page).
+Each pair denotes a point on the cell's boundary. The blank line signifies the start of a new cell's data.
 
-## Create your first Markdown Page
+### 🖥️ Data Parsing Procedure
 
-Create a file at `src/pages/my-markdown-page.md`:
+Our application utilizes a specialized function to process your data:
 
-```mdx title="src/pages/my-markdown-page.md"
-# My Markdown page
-
-This is a Markdown page
+```python
+def parse_coordinates(file_path):
+    # ... (function definition as you provided) ...
 ```
 
-A new page is now available at [http://localhost:3000/my-markdown-page](http://localhost:3000/my-markdown-page).
+This function segregates the cells based on line breaks and delineates individual points using spaces.
+
+## Preparing Your Coordinate Data
+
+Welcome to the Cell Shape Analysis App! To ensure a smooth and efficient analysis, it's essential that your cell shape coordinate data is in the correct format. Let's delve into how you can achieve this.
+
+#### 📜 Desired Format & Structure
+
+Your data should be structured in the following manner:
+
+- Each xy coordinate pair should be separated by a space.
+- Different cells should be distinguished with a line break.
+
+**Example:**
+
+```
+x1 y1
+x2 y2
+x3 y3
+...
+
+x1 y1
+x2 y2
+```
+
+### 🖥️ Helper Functions to Convert Your Data
+
+If your data isn't already in this format, don't worry! Below are a few Python helper functions to assist you in converting your data:
+
+1. **From List of Lists to Desired Format**:
+If you have your data in a list of lists (where each list represents a cell's coordinates), use this function:
+
+```python
+def from_lists_to_format(cells):
+    formatted_data = ""
+    for cell in cells:
+        for coord in cell:
+            formatted_data += f"{coord[0]} {coord[1]}\n"
+        formatted_data += "\n"
+    return formatted_data
+```
+
+Usage:
+
+```python
+data = [
+    [[1,2], [3,4], [5,6]],
+    [[7,8], [9,10]]
+]
+formatted_data = from_lists_to_format(data)
+print(formatted_data)
+```
+
+2. **From CSV to Desired Format**:
+If your data is in a CSV format where each row represents a coordinate and each cell is separated by a new row, use this function:
+
+```python
+import csv
+
+def from_csv_to_format(csv_path):
+    formatted_data = ""
+    with open(csv_path, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            formatted_data += f"{row[0]} {row[1]}\n"
+        formatted_data += "\n"
+    return formatted_data
+```
+
+Usage:
+
+```python
+formatted_data = from_csv_to_format("path_to_your_file.csv")
+print(formatted_data)
+```
+
+Once you've transformed your data using one of the helper functions above, you can save the output to a text file or directly input it into our Cell Shape Analysis App.
+
+🔍 **Tip**: Always double-check your formatted data to ensure there aren't any discrepancies. Proper data preparation is the foundation of accurate analysis. Happy Analyzing! 🎉
+
+
+### ❗ Common Mistakes & Corrections
+
+1. **Missing Line Breaks**: Ensure each cell's data is separated by a line break. This distinction is vital for accurate analysis.
+2. **Incorrect Delimiters**: Use a space to demarcate the x and y coordinates. Other delimiters will lead to parsing errors.
+3. **Extraneous Data**: Only include the xy coordinates in the file. Any additional data will be disregarded.
+
+### 🚀 Ready to Proceed?
+
+With your data formatted correctly, you're poised to unlock insights into the world of cell shapes. Ensure adherence to the guidelines for optimal results.
+
+🤓 **Tip**: Cells might be small, but their details are profound. Happy Analyzing! 🎉

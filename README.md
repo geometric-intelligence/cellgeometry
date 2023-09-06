@@ -3,6 +3,9 @@
 
 [![Docker](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/amilworks/cells/actions/workflows/docker-publish.yml)
 
+[[__`CellGeometry App`__]](https://cellgeometry.ece.ucsb.edu)
+[[__`Docs`__]](https://bioshape-lab.github.io/cellgeometry/)
+
 A web-based application for Cell Shape Analysis.
 
 
