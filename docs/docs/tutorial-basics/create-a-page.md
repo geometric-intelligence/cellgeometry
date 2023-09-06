@@ -2,13 +2,13 @@
 sidebar_position: 1
 ---
 
-# Formatting your Input Data
+# 📘 Formatting your Input Data
 
-### 📘 Cell Shape Analysis App: Input Data Documentation 📘
+## Preparing your Data  
 
 Greetings, Cell Shape Researcher! 🧪 Before you embark on your analysis, it's crucial to ensure that your data is formatted correctly for our application.
 
-#### 📜 Format & Structure
+### 📜 Format & Structure
 
 Your data should be presented in a text file with xy coordinates for each cell:
 
@@ -29,7 +29,7 @@ x2 y2
 
 Each pair denotes a point on the cell's boundary. The blank line signifies the start of a new cell's data.
 
-#### 🖥️ Data Parsing Procedure
+### 🖥️ Data Parsing Procedure
 
 Our application utilizes a specialized function to process your data:
 
@@ -40,7 +40,7 @@ def parse_coordinates(file_path):
 
 This function segregates the cells based on line breaks and delineates individual points using spaces.
 
-### 📘 Cell Shape Analysis App: Preparing Your Coordinate Data 📘
+## Preparing Your Coordinate Data
 
 Welcome to the Cell Shape Analysis App! To ensure a smooth and efficient analysis, it's essential that your cell shape coordinate data is in the correct format. Let's delve into how you can achieve this.
 
@@ -63,7 +63,7 @@ x1 y1
 x2 y2
 ```
 
-#### 🖥️ Helper Functions to Convert Your Data
+### 🖥️ Helper Functions to Convert Your Data
 
 If your data isn't already in this format, don't worry! Below are a few Python helper functions to assist you in converting your data:
 
@@ -119,13 +119,13 @@ Once you've transformed your data using one of the helper functions above, you c
 🔍 **Tip**: Always double-check your formatted data to ensure there aren't any discrepancies. Proper data preparation is the foundation of accurate analysis. Happy Analyzing! 🎉
 
 
-#### ❗ Common Mistakes & Corrections
+### ❗ Common Mistakes & Corrections
 
 1. **Missing Line Breaks**: Ensure each cell's data is separated by a line break. This distinction is vital for accurate analysis.
 2. **Incorrect Delimiters**: Use a space to demarcate the x and y coordinates. Other delimiters will lead to parsing errors.
 3. **Extraneous Data**: Only include the xy coordinates in the file. Any additional data will be disregarded.
 
-#### 🚀 Ready to Proceed?
+### 🚀 Ready to Proceed?
 
 With your data formatted correctly, you're poised to unlock insights into the world of cell shapes. Ensure adherence to the guidelines for optimal results.
 
