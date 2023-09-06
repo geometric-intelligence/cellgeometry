@@ -28,7 +28,7 @@ if "cell_shapes" not in st.session_state:
         "👈 Have you uploaded a zipped file of ROIs under Load Data? Afterwards, go the the Mean Shape page and run the analysis there."
     )
     st.stop()
-cells = st.session_state["cells"]
+# cells = st.session_state["cells"]
 cell_shapes = st.session_state["cell_shapes"]
 
 
