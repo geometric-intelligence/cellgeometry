@@ -180,6 +180,9 @@ if st.session_state["config_option"] == "Upload a File":
                     st.session_state["selected_dataset"] = new_upload_folder
                     handle_uploaded_file(uploaded_file, new_upload_folder)
                 else:
+                    # st.session_state["selected_dataset"] = os.path.join(
+                    #     upload_folder, uploaded_file.name
+                    # )
                     handle_uploaded_file(uploaded_file, upload_folder)
 
             build_and_load_data(st.session_state["selected_dataset"])

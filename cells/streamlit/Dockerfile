@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir poetry && \
     poetry install --no-dev
 
 RUN pip install git+https://github.com/geomstats/geomstats.git && \
-    pip install pacmap
+    pip install pacmap open3d
 
 # Copy the entire project directory into the container
 COPY cellgeometry .

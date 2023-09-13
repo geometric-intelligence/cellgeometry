@@ -6,7 +6,9 @@ from geomstats.learning.frechet_mean import FrechetMean
 from sklearn.decomposition import PCA
 import pacmap
 import plotly.express as px
-
+import requests
+import numpy as np
+import open3d as o3d
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
@@ -23,22 +25,38 @@ PaCMAP (Pairwise Controlled Manifold Approximation) is a dimensionality reductio
 """
 )
 
-if "cell_shapes" not in st.session_state:
-    st.warning(
-        "👈 Have you uploaded a zipped file of ROIs under Load Data? Afterwards, go the the Mean Shape page and run the analysis there."
-    )
-    st.stop()
-# cells = st.session_state["cells"]
-cell_shapes = st.session_state["cell_shapes"]
+# st.help(pacmap.PaCMAP)
 
 
-if st.session_state["cell_lines"] is not None:
-    cell_lines = st.session_state["cell_lines"]
-    if st.session_state["treatment"] is not None:
-        treatment = st.session_state["treatment"]
+# # Send POST request
+# response = requests.post(url, json=data)
+# st.write("Sent request to server")
+# # Check if the request was successful
+# if response.status_code == 200:
+#     transformed_data = response.json().get("transformed_data")
+#     print("Transformed Data:", transformed_data)
+# else:
+#     print(f"Error {response.status_code}: {response.text}")
 
 
-cells_flat = gs.reshape(cell_shapes, (len(cell_shapes), -1))
+# if "cell_shapes" not in st.session_state:
+#     st.warning(
+#         "👈 Have you uploaded a zipped file of ROIs under Load Data? Afterwards, go the the Mean Shape page and run the analysis there."
+#     )
+#     st.stop()
+# # cells = st.session_state["cells"]
+# cell_shapes = st.session_state["cell_shapes"]
+
+
+# if st.session_state["cell_lines"] is not None:
+#     cell_lines = st.session_state["cell_lines"]
+#     if st.session_state["treatment"] is not None:
+#         treatment = st.session_state["treatment"]
+
+
+# cells_flat = gs.reshape(cell_shapes, (len(cell_shapes), -1))
+
+
 # st.write("Cells flat", cells_flat.shape)
 
 # R1 = Euclidean(dim=1)
@@ -48,45 +66,25 @@ cells_flat = gs.reshape(cell_shapes, (len(cell_shapes), -1))
 
 # n_components = st.slider("Select the Number of Sampling Points", 0, len(cells_flat), 10)
 
+
 # st.write(treatment.shape)
 # Perform PacMap dimensionality reduction
-model = pacmap.PaCMAP()
+
 # st.help(pacmap.PaCMAP)
 
 runPacmap = st.toggle("Run PACMAP Analysis", False)
 
 if runPacmap:
 
-    embedding = model.fit_transform(cells_flat)
-    # st.write(embedding.shape)
-    # st.write(cell_lines.shape)
-
-    # Visualize the embedding using Plotly Express
-    # Create a scatter plot with coloring based on 'cell_lines' and symbols based on 'treatments'
-    fig = px.scatter(
-        x=embedding[:, 0],
-        y=embedding[:, 1],
-        color=gs.squeeze(cell_lines),  # differentiate by color based on cell_lines
-        symbol=gs.squeeze(treatment),  # differentiate by symbol based on treatments
-        title="PacMap Embedding",
-        labels={"x": "Dimension 1", "y": "Dimension 2"},
-        color_discrete_sequence=px.colors.qualitative.Set1,  # use a color palette
-    )
-
-    # Update layout for better clarity, if needed
-    fig.update_layout(legend_title_text="Cell Lines", legend_itemsizing="constant")
-
-    # Display the Plotly figure in Streamlit
-    st.plotly_chart(fig)
-
     col1, col2, col3 = st.columns(3)
 
     with col1:
         st.markdown("##### Number of Components")
         n_components = st.number_input(
-            "Default = 2",
-            min_value=2,
+            "Default = 3",
+            min_value=3,
             max_value=None,
+            key="n_components",
         )
         st.write("Input dimensions of the embedded space.", n_components)
 
@@ -112,6 +110,78 @@ if runPacmap:
     )
 
     st.write("Select distance metric.")
+    model = pacmap.PaCMAP(n_components=st.session_state["n_components"])
+    embedding = model.fit_transform([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]])
+    st.write(embedding.shape)
+    # st.write(cell_lines.shape)
+
+    # Visualize the embedding using Plotly Express
+    # Create a scatter plot with coloring based on 'cell_lines' and symbols based on 'treatments'
+    fig = px.scatter_3d(
+        x=embedding[:, 0],
+        y=embedding[:, 1],
+        z=embedding[:, 2],
+        color=gs.squeeze(cell_lines),  # differentiate by color based on cell_lines
+        symbol=gs.squeeze(treatment),  # differentiate by symbol based on treatments
+        title="PacMap Embedding",
+        labels={"x": "Dimension 1", "y": "Dimension 2", "z": "Dimension 3"},
+        color_discrete_sequence=px.colors.qualitative.Light24,  # use a color palette
+    )
+
+    # Update layout for better clarity, if needed
+    fig.update_layout(legend_title_text="Cell Lines", legend_itemsizing="constant")
+
+    # Display the Plotly figure in Streamlit
+    st.plotly_chart(fig)
+
+    st.stop()
+    # Create an Open3D PointCloud object
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(embedding[:, :3])
+    pcd.estimate_normals()
+    # Compute a mesh from the point cloud using the Ball-Pivoting Algorithm
+    radii = [0.005, 0.01, 0.02, 0.04]
+    mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
+        pcd, o3d.utility.DoubleVector(radii)
+    )
+    # Compute normals for the point cloud
+    # pcd.estimate_normals()
+
+    # Access the vertices and faces
+    vertices = np.asarray(mesh.vertices)
+    # triangles = np.asarray(mesh.triangles)
+    from scipy.spatial import Delaunay
+
+    tri = Delaunay(vertices)
+    triangles = tri.simplices
+    st.write(
+        """
+### 3D Mesh Reconstruction from Reduced Dimension Embeddings
+
+#### Description
+The plot visualizes a 3D mesh that's been reconstructed from reduced dimension embeddings. Initially, a point cloud is formed from these embeddings. From this point cloud, a mesh is generated using the Ball-Pivoting Algorithm, which identifies possible triangles by virtually rolling a ball over the point cloud. The final visualization provides a geometric representation of the relationships and structures within the embeddings, showcasing patterns and clusters that might not be evident in a simple scatter plot.
+             """
+    )
+    # fig = go.Figure(data=[go.Scatter3d(x=vertices[:, 0], y=vertices[:, 1], z=vertices[:, 2], mode='markers')])
+    # Create a Mesh3D plot
+    fig = go.Figure(
+        data=[
+            go.Mesh3d(
+                x=vertices[:, 0],
+                y=vertices[:, 1],
+                z=vertices[:, 2],
+                i=triangles[:, 0],  # i, j, k define the vertices of the triangles
+                j=triangles[:, 1],
+                k=triangles[:, 2],
+                opacity=0.9,
+            )
+        ]
+    )
+    # Set plot layout
+    # fig.update_layout(scene=dict(aspectmode='data'))
+
+    # Show the plot
+    st.plotly_chart(fig)
 
     st.markdown(
         """ ### Background on PACMAP
@@ -123,6 +193,57 @@ if runPacmap:
     """
     )
 # pcas = {}
+st.header("Random Forest Classifier")
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import pandas as pd
+
+selected_label = st.radio(
+    "Select the labels to train the classifier", ("cell_lines", "treatment")
+)
+# Convert data to DataFrame
+df = pd.DataFrame(embedding)
+X = df.values  # Features (PCA components)
+y = st.session_state[selected_label]  # Labels
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+# Initialize and train the Random Forest classifier
+clf = RandomForestClassifier(n_estimators=100, random_state=42)
+clf.fit(X_train, y_train)
+
+# Predict on the test set
+y_pred = clf.predict(X_test)
+
+# Calculate accuracy
+accuracy = accuracy_score(y_test, y_pred)
+st.write(f"Accuracy: {accuracy * 100:.2f}%")
+
+# Extract feature importances
+feature_importances = clf.feature_importances_
+df_importance = pd.DataFrame(
+    {
+        "Features": list(range(n_components)),
+        "Importance": feature_importances,
+        # 'Treatment': y  # Assuming all treatments in the sample data are the same; adjust as needed
+    }
+)
+
+# Create the plot
+fig = px.bar(
+    df_importance,
+    x="Features",
+    y="Importance",
+    title="Feature Importances of PCA Components by Treatment",
+    labels={"Importance": "Importance Value", "Features": "PCA Components"},
+)
+
+st.plotly_chart(fig)
 
 # st.write(mean.estimate_)
 # logs = CURVES_SPACE_SRV.metric.log(cells_flat, base_point=mean.estimate_)

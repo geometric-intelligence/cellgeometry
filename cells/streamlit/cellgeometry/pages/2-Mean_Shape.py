@@ -284,8 +284,8 @@ if compute_mean_shape:
     for cell in cell_shapes:
         fig.add_trace(
             go.Scatter(
-                x=cell[:, 0],
-                y=cell[:, 1],
+                x=cell[:250, 0],
+                y=cell[:250, 1],
                 mode="lines",
                 line=dict(color="lightgrey", width=1),
             )

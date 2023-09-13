@@ -212,20 +212,29 @@ def parse_coordinates(file_path):
             line = line.strip()
 
             if line:
-                try:
-                    x, y = map(int, line.split())
-                    cell_data.append([x, y])
-                except ValueError:
-                    print(f"Skipping invalid line: {line}")
-            else:
-                if cell_data:
-                    coordinates[cell_id] = np.array(cell_data)
-                    cell_id += 1
-                    cell_data = []
+                # Check if the line contains a comma; if yes, split by comma, else split by space
+                if "," in line:
+                    try:
+                        x, y = map(float, line.split(","))
+                        cell_data.append([x, y])
+                    except ValueError:
+                        print(f"Skipping invalid line: {line}")
+                else:
+                    try:
+                        x, y = map(float, line.split())
+                        cell_data.append([x, y])
+                    except ValueError:
+                        print(f"Skipping invalid line: {line}")
+            elif (
+                cell_data
+            ):  # if line is empty and cell_data has data, add to dictionary
+                coordinates[cell_id] = np.array(cell_data)
+                cell_id += 1
+                cell_data = []
 
-    # Handle the last cell if it doesn't have a line break after it
-    if cell_data:
-        coordinates[cell_id] = np.array(cell_data)
+        # Handle the last cell if it doesn't have a line break after it
+        if cell_data:
+            coordinates[cell_id] = np.array(cell_data)
 
     return coordinates
 

@@ -10,7 +10,7 @@ build:
 
 # Runs the docker container
 run:
-	@docker run -itp 8501:8501 -d --rm --name streamlit -v ./cellgeometry:/app amilworks/streamlit-geomstats
+	@docker run -itp 8501:8501 --network pacmap2_default -d --rm --name streamlit -v ./cellgeometry:/app amilworks/streamlit-geomstats
 
 # Calls all the above targets
 all: stop build run
