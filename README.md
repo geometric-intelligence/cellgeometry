@@ -5,7 +5,7 @@
 
 
 [[__`CellGeometry App`__]](https://cellgeometry.ece.ucsb.edu)
-[[__`Docs`__]](https://bioshape-lab.github.io/cellgeometry/)
+[[__`Docs`__]](https://geometric-intelligence.github.io/cellgeometry/)
 
 A web-based application for Cell Shape Analysis.
 
